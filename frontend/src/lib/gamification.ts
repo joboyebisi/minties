@@ -1,7 +1,8 @@
-import { supabase, type UserProfile, type GamificationEvent, type Badge } from './supabase';
+import { supabase, type UserProfile, type GamificationEvent, type Badge as BadgeType } from './supabase';
 
-// Re-export types (avoiding duplicate declaration)
-export type { Badge, UserProfile, GamificationEvent };
+// Re-export types (using alias to avoid duplicate)
+export type Badge = BadgeType;
+export type { UserProfile, GamificationEvent };
 
 // Points system
 export const POINTS = {
@@ -201,8 +202,6 @@ export async function checkAndAwardBadges(userId: string): Promise<void> {
     }
   }
 }
-
-export type { Badge };
 
 export async function getUserBadges(userId: string): Promise<Badge[]> {
   if (!supabase) return [];
