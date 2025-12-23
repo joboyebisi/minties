@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState as useReactState } from "react";
 import Link from "next/link";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, useWalletClient, useChainId } from "wagmi";
+import { sepolia } from "wagmi/chains";
 import { ConnectButton } from "@/components/ConnectButton";
 import { GiftClaim } from "@/components/GiftClaim";
 import { SavingsCircle } from "@/components/SavingsCircle";
@@ -12,6 +13,7 @@ import { CTASection } from "@/components/CTASection";
 import { FAQ } from "@/components/FAQ";
 import { GamificationPanel } from "@/components/GamificationPanel";
 import { WalletStatus } from "@/components/WalletStatus";
+import { WalletConnectionGuard } from "@/components/WalletConnectionGuard";
 import { Gift, PiggyBank, Send, Sparkles, Calculator, Target, Users } from "lucide-react";
 import { fetchAaveApy, supplyUsdc, withdrawUsdc } from "@/lib/aave";
 import { useToast } from "@/components/ToastProvider";
@@ -59,13 +61,15 @@ export default function Home() {
 
         {/* Money Box + Gifts */}
         <section id="moneybox" className="space-y-4">
-          <ActionCard
-            title="📈 Money Box (with yield)"
-            icon={<Calculator size={18} className="text-[#30f0a8]" />}
-            body="Target savings toward a goal and see projected yield (Aave-ready)."
-            cta="Get Yield on Your Goal"
-            content={<MoneyBoxCalculator />}
-          />
+          <WalletConnectionGuard>
+            <ActionCard
+              title="📈 Money Box (with yield)"
+              icon={<Calculator size={18} className="text-[#30f0a8]" />}
+              body="Target savings toward a goal and see projected yield (Aave-ready)."
+              cta="Get Yield on Your Goal"
+              content={<MoneyBoxCalculator />}
+            />
+          </WalletConnectionGuard>
           {/* Gifts card immediately under Money Box */}
           <CTASection />
         </section>
@@ -153,6 +157,7 @@ function MiniCard({ title, body }: { title: string; body: string }) {
 function MoneyBoxCalculator() {
   const { address, isConnected, isConnecting } = useAccount();
   const { data: walletClient, isPending: walletClientPending } = useWalletClient();
+  const chainId = useChainId();
   const { user: telegramUser } = useTelegram();
   const [amount, setAmount] = useReactState(2000);
   const [months, setMonths] = useReactState(6);
@@ -189,11 +194,17 @@ function MoneyBoxCalculator() {
       return;
     }
     
+    // Check if on correct network
+    if (chainId !== sepolia.id) {
+      show("error", "Please switch to Sepolia network in MetaMask");
+      return;
+    }
+    
     if (!walletClient) {
       if (walletClientPending || isConnecting) {
         show("error", "Wallet is connecting, please wait...");
       } else {
-        show("error", "Wallet client not ready. Please reconnect your wallet.");
+        show("error", "Wallet not ready. Please refresh the page or reconnect your wallet.");
       }
       return;
     }
@@ -225,11 +236,17 @@ function MoneyBoxCalculator() {
       return;
     }
     
+    // Check if on correct network
+    if (chainId !== sepolia.id) {
+      show("error", "Please switch to Sepolia network in MetaMask");
+      return;
+    }
+    
     if (!walletClient) {
       if (walletClientPending || isConnecting) {
         show("error", "Wallet is connecting, please wait...");
       } else {
-        show("error", "Wallet client not ready. Please reconnect your wallet.");
+        show("error", "Wallet not ready. Please refresh the page or reconnect your wallet.");
       }
       return;
     }
