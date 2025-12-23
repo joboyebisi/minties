@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #030504;
+  --foreground: #e8fdf4;
+  --surface: #0a0f0d;
+  --surface-muted: #0f1613;
+  --border: #1e2a24;
+  --muted: #bfe8d7;
+  --accent: #30f0a8;
+  --accent-strong: #16d38f;
+  --accent-ghost: rgba(48, 240, 168, 0.12);
+  --ink: #0b1112;
+}
+
+* {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+body {
+  color: var(--foreground);
+  background: radial-gradient(40% 30% at 20% 20%, rgba(48, 240, 168, 0.12), transparent),
+    radial-gradient(30% 25% at 80% 10%, rgba(59, 199, 215, 0.12), transparent),
+    linear-gradient(180deg, #050505 0%, #020303 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--accent);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+}
+
+.btn-primary {
+  @apply px-4 py-3 rounded-full font-semibold transition-all duration-200 border;
+  color: #050505;
+  background: #ffffff;
+  border-color: rgba(48, 240, 168, 0.35);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.btn-primary:hover {
+  filter: none;
+  background: #f5fff9;
+}
+
+.btn-secondary {
+  @apply px-4 py-3 rounded-full font-semibold transition-all duration-200 border;
+  color: #050505;
+  border-color: rgba(48, 240, 168, 0.5);
+  background: #ffffff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.badge {
+  @apply px-3 py-1 rounded-full text-xs font-semibold;
+  background: rgba(48, 240, 168, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(48, 240, 168, 0.35);
+}
+
+.glass {
+  background: rgba(12, 18, 16, 0.7);
+  border: 1px solid rgba(48, 240, 168, 0.15);
+  backdrop-filter: blur(12px);
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 0;
+  }
+}
+
