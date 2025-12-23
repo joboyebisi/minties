@@ -11,6 +11,7 @@ import { NavBar } from "@/components/NavBar";
 import { CTASection } from "@/components/CTASection";
 import { FAQ } from "@/components/FAQ";
 import { GamificationPanel } from "@/components/GamificationPanel";
+import { WalletStatus } from "@/components/WalletStatus";
 import { Gift, PiggyBank, Send, Sparkles, Calculator, Target, Users } from "lucide-react";
 import { fetchAaveApy, supplyUsdc, withdrawUsdc } from "@/lib/aave";
 import { useToast } from "@/components/ToastProvider";
@@ -103,6 +104,7 @@ export default function Home() {
         {/* FAQ */}
         <FAQ />
       </div>
+      <WalletStatus />
     </main>
   );
 }
@@ -149,8 +151,8 @@ function MiniCard({ title, body }: { title: string; body: string }) {
 }
 
 function MoneyBoxCalculator() {
-  const { isConnected } = useAccount();
-  const { data: walletClient } = useWalletClient();
+  const { address, isConnected, isConnecting } = useAccount();
+  const { data: walletClient, isPending: walletClientPending } = useWalletClient();
   const { user: telegramUser } = useTelegram();
   const [amount, setAmount] = useReactState(2000);
   const [months, setMonths] = useReactState(6);
@@ -181,10 +183,21 @@ function MoneyBoxCalculator() {
   const totalWithYield = amount + projectedYield;
 
   const handleStartSaving = async () => {
-    if (!isConnected || !walletClient) {
-      show("error", "Connect wallet first");
+    // Check connection state more thoroughly
+    if (!isConnected || !address) {
+      show("error", "Please connect your wallet first");
       return;
     }
+    
+    if (!walletClient) {
+      if (walletClientPending || isConnecting) {
+        show("error", "Wallet is connecting, please wait...");
+      } else {
+        show("error", "Wallet client not ready. Please reconnect your wallet.");
+      }
+      return;
+    }
+    
     try {
       setLoading(true);
       await supplyUsdc({ walletClient, amount, decimals: 6 });
@@ -207,8 +220,17 @@ function MoneyBoxCalculator() {
   };
 
   const handleWithdraw = async () => {
-    if (!isConnected || !walletClient) {
-      show("error", "Connect wallet first");
+    if (!isConnected || !address) {
+      show("error", "Please connect your wallet first");
+      return;
+    }
+    
+    if (!walletClient) {
+      if (walletClientPending || isConnecting) {
+        show("error", "Wallet is connecting, please wait...");
+      } else {
+        show("error", "Wallet client not ready. Please reconnect your wallet.");
+      }
       return;
     }
     try {
@@ -267,17 +289,17 @@ function MoneyBoxCalculator() {
       </div>
       <button
         className="btn-primary w-full text-center disabled:opacity-60"
-        disabled={!isConnected || loading}
+        disabled={!isConnected || !walletClient || loading || walletClientPending}
         onClick={handleStartSaving}
       >
-        {loading ? "Supplying..." : "Start Saving"}
+        {loading ? "Supplying..." : !walletClient ? "Preparing wallet..." : "Start Saving"}
       </button>
       <button
         className="btn-secondary w-full text-center disabled:opacity-60"
-        disabled={!isConnected || withdrawing}
+        disabled={!isConnected || !walletClient || withdrawing || walletClientPending}
         onClick={handleWithdraw}
       >
-        {withdrawing ? "Withdrawing..." : "Withdraw"}
+        {withdrawing ? "Withdrawing..." : !walletClient ? "Preparing wallet..." : "Withdraw"}
       </button>
       <p className="text-[11px] text-[#8da196]">
         APY fetched from Aave Sepolia pool. Estimates only; actual yield may vary. We’ll integrate periodic permissions for auto-pulls.

@@ -105,21 +105,38 @@ export async function supplyUsdc({
   amount: number;
   decimals?: number;
 }) {
+  if (!walletClient) {
+    throw new Error("Wallet client not available. Please ensure your wallet is connected.");
+  }
+  
+  if (!walletClient.account?.address) {
+    throw new Error("Wallet account not found. Please reconnect your wallet.");
+  }
+
   const parsed = BigInt(Math.round(amount * 10 ** decimals));
+  const accountAddress = walletClient.account.address as Address;
+  
   // approve USDC -> Pool
   const approveTx = await walletClient.writeContract({
     address: USDC_ADDRESS,
     abi: erc20Abi,
     functionName: "approve",
     args: [AAVE_POOL_ADDRESS, parsed],
+    account: walletClient.account,
   });
-  // wait optional: walletClient doesn't await; assume user confirms
+  
+  // Wait for approval to be mined (optional but recommended)
+  // In production, you might want to wait for the transaction receipt
+  
+  // Supply to Aave
   const supplyTx = await walletClient.writeContract({
     address: AAVE_POOL_ADDRESS,
     abi: poolAbi,
     functionName: "supply",
-    args: [USDC_ADDRESS, parsed, walletClient.account?.address as Address, 0],
+    args: [USDC_ADDRESS, parsed, accountAddress, 0],
+    account: walletClient.account,
   });
+  
   return { approveTx, supplyTx };
 }
 
@@ -132,13 +149,25 @@ export async function withdrawUsdc({
   amount: number;
   decimals?: number;
 }) {
+  if (!walletClient) {
+    throw new Error("Wallet client not available. Please ensure your wallet is connected.");
+  }
+  
+  if (!walletClient.account?.address) {
+    throw new Error("Wallet account not found. Please reconnect your wallet.");
+  }
+
   const parsed = BigInt(Math.round(amount * 10 ** decimals));
+  const accountAddress = walletClient.account.address as Address;
+  
   const tx = await walletClient.writeContract({
     address: AAVE_POOL_ADDRESS,
     abi: poolAbi,
     functionName: "withdraw",
-    args: [USDC_ADDRESS, parsed, walletClient.account?.address as Address],
+    args: [USDC_ADDRESS, parsed, accountAddress],
+    account: walletClient.account,
   });
+  
   return tx as Hash;
 }
 
