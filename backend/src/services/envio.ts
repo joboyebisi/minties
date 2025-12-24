@@ -43,8 +43,8 @@ async function queryEnvio<T>(query: string, variables?: Record<string, any>): Pr
       return null;
     }
 
-    const jsonData = await response.json() as unknown;
-    const result = jsonData as EnvioQueryResult<T>;
+    // Type assertion: response.json() returns Promise<any> which needs to be cast
+    const result = (await response.json()) as EnvioQueryResult<T>;
 
     if (result.errors) {
       console.error('Envio query errors:', result.errors);
