@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Wallet, Gift, PiggyBank } from "lucide-react";
+import { Wallet, Gift, PiggyBank, MessageCircle } from "lucide-react";
+
+const TELEGRAM_BOT_USERNAME = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "minties_bot";
 
 export function NavBar() {
+  const telegramUrl = `https://t.me/${TELEGRAM_BOT_USERNAME}`;
+
   return (
     <header className="sticky top-0 z-30 backdrop-blur-md bg-[rgba(5,9,8,0.7)] border-b border-[rgba(48,240,168,0.12)]">
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -21,7 +25,7 @@ export function NavBar() {
             </div>
             <div>
               <p className="text-sm text-[#bfe8d7]">Minties</p>
-              <p className="text-[10px] text-[#8da196]">Telegram Mini App</p>
+              <p className="text-[10px] text-[#8da196]">MoneyBox · Gifts · Circles</p>
             </div>
           </Link>
         </div>
@@ -44,6 +48,14 @@ export function NavBar() {
           >
             <Wallet size={16} className="text-[#30f0a8]" /> Wallet
           </Link>
+          <a
+            href={telegramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-3 py-2 rounded-full hover:bg-[rgba(48,240,168,0.08)] transition border border-[rgba(48,240,168,0.2)]"
+          >
+            <MessageCircle size={16} className="text-[#30f0a8]" /> Telegram
+          </a>
         </nav>
       </div>
     </header>

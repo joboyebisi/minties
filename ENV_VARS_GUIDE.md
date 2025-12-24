@@ -20,6 +20,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 NEXT_PUBLIC_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 NEXT_PUBLIC_BUNDLER_URL=https://api.pimlico.io/v2/11155111/rpc
+NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=minties_bot
 ```
 
 **For Local Development**: Create `frontend/.env.local` file:
@@ -28,6 +29,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 NEXT_PUBLIC_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 NEXT_PUBLIC_BUNDLER_URL=https://api.pimlico.io/v2/11155111/rpc
+NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=minties_bot
 ```
 
 ---
@@ -110,7 +112,7 @@ Copy the deployed addresses from the output.
 2. Create a new project and deploy indexer
 3. Get your GraphQL API endpoint → `ENVIO_API_URL` (from dashboard)
 4. Copy your API key → `ENVIO_API_KEY` (if required)
-5. See `ENVIO_API_SETUP.md` for detailed instructions
+5. See `QUICK_DEPLOY.md` for deployment instructions
 
 ### Frontend URL
 After deploying to Vercel:
@@ -147,4 +149,5 @@ After deploying to Vercel:
 | `USE_HYPERSYNC` | ❌ | ✅ (optional) | Set to "true" to use Envio HyperSync instead of ethers.js |
 | `HYPERSYNC_API_TOKEN` | ❌ | ✅ (optional) | Envio API token (from dashboard) |
 | `HYPERSYNC_URL` | ❌ | ✅ (optional) | HyperSync endpoint (default: https://sepolia.hypersync.xyz) |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | ✅ | ❌ | Telegram bot username (e.g., minties_bot) |
 

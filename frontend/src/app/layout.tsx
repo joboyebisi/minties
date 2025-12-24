@@ -9,8 +9,8 @@ import { ToastProvider } from "@/components/ToastProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Minties - Send Crypto Gifts & Savings Circles",
-  description: "Send USDC gifts and start savings circles with friends on Telegram",
+  title: "Minties - MoneyBox, Crypto Gifts & Savings Circles",
+  description: "Target savings with high yield, send USDC gifts, and save with friends in savings circles—all in Telegram",
   icons: {
     icon: "/favicon.ico",
   },

@@ -26,12 +26,7 @@ This directory contains all SQL migration files needed to set up the Minties Sup
   - Service role can insert/update (for backend)
 - **Run this last** after schema and RPC functions
 
-### 4. `QUICK_START.md`
-- Quick reference guide
-- Migration order reminder
-- Common troubleshooting tips
-
-### 5. `../SUPABASE_SETUP.md`
+### 4. `../SUPABASE_SETUP.md`
 - Complete setup guide with step-by-step instructions
 - Environment variable configuration
 - Security best practices

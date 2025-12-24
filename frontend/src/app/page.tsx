@@ -34,10 +34,10 @@ export default function Home() {
             Telegram Mini App Ready · Save with friends toward a goal
           </div>
           <h1 className="text-4xl md:text-5xl font-semibold leading-tight text-[#e8fdf4]">
-            Save towards Target, Earn yield, Send gifts — all in Telegram.
+            MoneyBox, Crypto Gifts & Savings Circles
           </h1>
           <p className="text-base md:text-lg text-[#bfe8d7] max-w-2xl mx-auto">
-            Target savings (Money Box) with high yield, save with friends, set up one-time and recurring USDC gifts—all in one minty interface. Powered by MetaMask Smart Accounts, Aave DeFi, and Telegram-native sharing.
+            Target savings with high yield, send USDC gifts, and save with friends in savings circles—all in one Telegram Mini App. Powered by MetaMask Smart Accounts, Aave DeFi, and Telegram-native sharing.
           </p>
           {isTelegram && user && (
             <p className="text-sm text-[#8da196]">

@@ -50,7 +50,7 @@ For better performance:
 ## Files
 
 - `backend/src/services/events.ts` - Event query service (✅ Ready to use)
-- `ENVIO_ALTERNATIVE.md` - Explanation of this approach
+- `backend/src/services/eventQuery.ts` - Event query abstraction with HyperSync support
 
 ## Next Steps
 
