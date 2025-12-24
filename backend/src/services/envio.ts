@@ -38,7 +38,13 @@ async function queryEnvio<T>(query: string, variables?: Record<string, any>): Pr
       }),
     });
 
-    const result: EnvioQueryResult<T> = await response.json();
+    if (!response.ok) {
+      console.error('Envio query failed with status:', response.status);
+      return null;
+    }
+
+    const jsonData: unknown = await response.json();
+    const result = jsonData as EnvioQueryResult<T>;
 
     if (result.errors) {
       console.error('Envio query errors:', result.errors);
