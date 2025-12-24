@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { Send, Gift } from "lucide-react";
 import { GiftClaim } from "@/components/GiftClaim";
 import { GiftSend } from "@/components/GiftSend";
@@ -20,7 +21,9 @@ export function CTASection() {
           <GiftSend />
         </div>
         <div className="border border-[#1e2a24] rounded-xl p-3 bg-[rgba(48,240,168,0.06)]">
-          <GiftClaim />
+          <Suspense fallback={<div className="text-sm text-gray-400">Loading...</div>}>
+            <GiftClaim />
+          </Suspense>
         </div>
       </div>
     </div>
