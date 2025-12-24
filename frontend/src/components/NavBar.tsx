@@ -4,10 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { Wallet, Gift, PiggyBank, MessageCircle } from "lucide-react";
 
-const TELEGRAM_BOT_USERNAME = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "minties_bot";
+const TELEGRAM_BOT_USERNAME = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "Minties_X_Bot";
 
 export function NavBar() {
-  const telegramUrl = `https://t.me/${TELEGRAM_BOT_USERNAME}`;
+  // Use direct bot link if provided, otherwise construct from username
+  const telegramUrl = process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || `https://t.me/${TELEGRAM_BOT_USERNAME}`;
 
   return (
     <header className="sticky top-0 z-30 backdrop-blur-md bg-[rgba(5,9,8,0.7)] border-b border-[rgba(48,240,168,0.12)]">
