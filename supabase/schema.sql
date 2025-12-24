@@ -110,7 +110,8 @@ CREATE TABLE IF NOT EXISTS recurring_transfers (
   delegation_signature TEXT, -- MetaMask Advanced Permissions
   status TEXT DEFAULT 'active' CHECK (status IN ('active', 'paused', 'cancelled')),
   next_transfer_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Indexes for performance
@@ -126,6 +127,13 @@ CREATE INDEX IF NOT EXISTS idx_gifts_recipient ON gifts(recipient_id);
 CREATE INDEX IF NOT EXISTS idx_gifts_link ON gifts(gift_link);
 CREATE INDEX IF NOT EXISTS idx_invites_code ON invites(invite_code);
 CREATE INDEX IF NOT EXISTS idx_recurring_transfers_user ON recurring_transfers(user_id);
+CREATE INDEX IF NOT EXISTS idx_recurring_transfers_status ON recurring_transfers(status);
+CREATE INDEX IF NOT EXISTS idx_recurring_transfers_next_transfer ON recurring_transfers(next_transfer_at) WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS idx_savings_circles_creator ON savings_circles(creator_id);
+CREATE INDEX IF NOT EXISTS idx_savings_circles_status ON savings_circles(status);
+CREATE INDEX IF NOT EXISTS idx_savings_goals_status ON savings_goals(status);
+CREATE INDEX IF NOT EXISTS idx_gifts_status ON gifts(status);
+CREATE INDEX IF NOT EXISTS idx_gifts_expires ON gifts(expires_at) WHERE status = 'pending';
 
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -138,6 +146,11 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_user_profiles_updated_at
   BEFORE UPDATE ON user_profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_recurring_transfers_updated_at
+  BEFORE UPDATE ON recurring_transfers
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 

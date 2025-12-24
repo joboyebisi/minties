@@ -1,101 +1,146 @@
 # Supabase Setup Guide for Minties
 
-## 1. Create Supabase Project
+This guide will walk you through setting up Supabase for the Minties application, including database schema, RPC functions, Row Level Security (RLS) policies, and environment variables.
 
-1. Go to [supabase.com](https://supabase.com) and sign in
-2. Click "New Project"
+## Prerequisites
+
+1. A Supabase account (sign up at https://supabase.com)
+2. A new Supabase project created
+
+## Step 1: Create Supabase Project
+
+1. Go to https://supabase.com and sign in
+2. Click **"New Project"**
 3. Fill in:
-   - **Name**: `minties` (or your choice)
-   - **Database Password**: Generate a strong password (save it!)
+   - **Name**: `minties` (or your preferred name)
+   - **Database Password**: Choose a strong password (save this!)
    - **Region**: Choose closest to your users
    - **Pricing Plan**: Free tier is fine for development
+4. Click **"Create new project"** and wait ~2 minutes for setup
 
-## 2. Run Database Schema
+## Step 2: Get Your Supabase Credentials
 
-1. In Supabase dashboard, go to **SQL Editor**
-2. Open `supabase/schema.sql` from this repo
-3. Copy and paste the entire contents into the SQL Editor
-4. Click **Run** (or press Ctrl+Enter)
-5. Wait for success message
+Once your project is ready:
 
-## 3. Run RPC Functions
-
-1. Still in SQL Editor, open `supabase/rpc.sql`
-2. Copy and paste into SQL Editor
-3. Click **Run**
-4. Verify functions are created (check the sidebar under "Functions")
-
-## 4. Get API Keys
-
-1. In Supabase dashboard, go to **Settings** → **API**
-2. Copy:
+1. Go to **Settings** → **API** in your Supabase dashboard
+2. Copy these values (you'll need them later):
    - **Project URL** (e.g., `https://xxxxx.supabase.co`)
    - **anon/public key** (starts with `eyJ...`)
-   - **service_role key** (starts with `eyJ...`) - Keep this secret!
+   - **service_role key** (starts with `eyJ...`) - **Keep this secret!**
 
-## 5. Set Environment Variables
+## Step 3: Run Database Migrations
 
-### Frontend (`.env.local`)
+**Important**: Run these migrations in order:
 
-```env
+### 3.1 Run Schema Migration (First)
+
+1. In Supabase dashboard, go to **SQL Editor**
+2. Click **"New query"**
+3. Copy and paste the entire contents of `supabase/schema.sql`
+4. Click **"Run"** (or press `Ctrl+Enter`)
+5. Verify success: You should see "Success. No rows returned"
+6. **Wait for completion** before proceeding
+
+### 3.2 Run RPC Functions Migration (Second)
+
+1. Still in **SQL Editor**, click **"New query"**
+2. Copy and paste the entire contents of `supabase/rpc.sql`
+3. Click **"Run"**
+4. Verify success: You should see "Success. No rows returned"
+
+### 3.3 Set Up Row Level Security (RLS) (Third)
+
+1. Still in **SQL Editor**, click **"New query"**
+2. Copy and paste the entire contents of `supabase/rls_policies.sql`
+3. Click **"Run"**
+4. Verify success: You should see "Success. No rows returned"
+
+## Step 4: Verify Tables Were Created
+
+1. Go to **Table Editor** in Supabase dashboard
+2. You should see these tables:
+   - `user_profiles`
+   - `gamification_events`
+   - `badges`
+   - `savings_goals`
+   - `savings_circles`
+   - `circle_members`
+   - `gifts`
+   - `invites`
+   - `recurring_transfers`
+
+## Step 5: Set Up Environment Variables
+
+### For Frontend (Vercel)
+
+Add these to your Vercel project settings:
+
+```
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ... (anon/public key)
 ```
 
-### Backend (`.env`)
+### For Backend (Railway)
 
-```env
+Add these to your Railway project settings:
+
+```
 SUPABASE_URL=https://xxxxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ... (service_role key - keep secret!)
 ```
 
-## 6. Enable Row Level Security (Optional but Recommended)
+⚠️ **Important**: Never expose the `service_role` key in frontend code. It bypasses RLS and has full database access.
 
-For production, you'll want to set up RLS policies. For now, the service role key gives full access (fine for development).
+## Step 6: Test Connection (Optional)
 
-## 7. Test Connection
+You can test the connection by running this in your frontend:
 
-After setting env vars, restart your dev servers:
+```typescript
+import { supabase } from './lib/supabase';
 
-```bash
-# Frontend
-cd frontend
-npm install @supabase/supabase-js
-npm run dev
-
-# Backend
-cd backend
-npm install @supabase/supabase-js
-npm run dev
+// Test query
+const { data, error } = await supabase.from('user_profiles').select('count');
+console.log('Supabase connection:', error ? 'Failed' : 'Success');
 ```
-
-Check browser console and backend logs for any connection errors.
-
-## 8. Verify Tables
-
-In Supabase dashboard → **Table Editor**, you should see:
-- `user_profiles`
-- `gamification_events`
-- `badges`
-- `savings_goals`
-- `savings_circles`
-- `circle_members`
-- `gifts`
-- `invites`
-- `recurring_transfers`
 
 ## Troubleshooting
 
-- **"Invalid API key"**: Double-check you copied the full key (they're long)
-- **"Relation does not exist"**: Make sure you ran `schema.sql` first
-- **"Function does not exist"**: Make sure you ran `rpc.sql` after `schema.sql`
-- **Connection timeout**: Check your network/firewall settings
+### "relation does not exist" error
+- Make sure you ran `schema.sql` first
+- Check that all tables appear in **Table Editor**
+
+### "function does not exist" error
+- Make sure you ran `rpc.sql` after `schema.sql`
+- Check **Database** → **Functions** in Supabase dashboard
+
+### RLS blocking queries
+- Make sure you ran `rls_policies.sql`
+- Check **Authentication** → **Policies** in Supabase dashboard
+- Verify you're using the correct key (anon for frontend, service_role for backend)
+
+### Connection issues
+- Verify your `SUPABASE_URL` doesn't have a trailing slash
+- Check that your API keys are copied correctly (no extra spaces)
+- Ensure your Supabase project is active (not paused)
 
 ## Next Steps
 
-Once Supabase is set up:
-1. Gamification will automatically track points, badges, streaks
-2. User profiles will be created on first Telegram interaction
-3. Invite system will work end-to-end
-4. All savings goals, circles, and gifts will be stored in Supabase
+After Supabase is set up:
+1. ✅ Set up Railway for backend deployment
+2. ✅ Set up Vercel for frontend deployment
+3. ✅ Configure environment variables in both platforms
+4. ✅ Test end-to-end functionality
 
+## Security Notes
+
+- **RLS Policies**: The provided RLS policies allow users to read/write their own data. Adjust as needed for your use case.
+- **Service Role Key**: Only use in backend/server-side code. Never expose to frontend.
+- **Anon Key**: Safe to use in frontend, but RLS policies will restrict access.
+- **API Keys**: Rotate keys periodically in **Settings** → **API** → **Regenerate**
+
+## Support
+
+If you encounter issues:
+1. Check Supabase logs: **Logs** → **Postgres Logs**
+2. Check API logs: **Logs** → **API Logs**
+3. Review Supabase docs: https://supabase.com/docs

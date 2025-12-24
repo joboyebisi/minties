@@ -63,3 +63,45 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Function to get active recurring transfers that need execution
+CREATE OR REPLACE FUNCTION get_due_recurring_transfers()
+RETURNS TABLE (
+  id UUID,
+  user_id UUID,
+  recipient_address TEXT,
+  amount DECIMAL(18, 6),
+  frequency TEXT,
+  delegation_signature TEXT,
+  next_transfer_at TIMESTAMPTZ
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    rt.id,
+    rt.user_id,
+    rt.recipient_address,
+    rt.amount,
+    rt.frequency,
+    rt.delegation_signature,
+    rt.next_transfer_at
+  FROM recurring_transfers rt
+  WHERE rt.status = 'active'
+    AND rt.next_transfer_at <= NOW()
+  ORDER BY rt.next_transfer_at ASC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to update next transfer time after execution
+CREATE OR REPLACE FUNCTION update_next_transfer_time(
+  transfer_id_param UUID,
+  new_next_transfer_at TIMESTAMPTZ
+)
+RETURNS void AS $$
+BEGIN
+  UPDATE recurring_transfers
+  SET next_transfer_at = new_next_transfer_at,
+      updated_at = NOW()
+  WHERE id = transfer_id_param;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+

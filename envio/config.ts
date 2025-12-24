@@ -6,14 +6,30 @@ export default defineConfig({
     {
       name: "GiftEscrow",
       address: process.env.GIFT_ESCROW_ADDRESS || "",
-      startBlock: 0,
+      startBlock: process.env.GIFT_ESCROW_START_BLOCK ? parseInt(process.env.GIFT_ESCROW_START_BLOCK) : 0,
     },
     {
       name: "SavingsCircle",
       address: process.env.SAVINGS_CIRCLE_ADDRESS || "",
-      startBlock: 0,
+      startBlock: process.env.SAVINGS_CIRCLE_START_BLOCK ? parseInt(process.env.SAVINGS_CIRCLE_START_BLOCK) : 0,
     },
   ],
+  handlers: {
+    GiftEscrow: {
+      GiftCreated: "./handlers/GiftEscrow.ts:handleGiftCreated",
+      GiftClaimed: "./handlers/GiftEscrow.ts:handleGiftClaimed",
+      GiftCancelled: "./handlers/GiftEscrow.ts:handleGiftCancelled",
+      GiftExpired: "./handlers/GiftEscrow.ts:handleGiftExpired",
+    },
+    SavingsCircle: {
+      CircleCreated: "./handlers/SavingsCircle.ts:handleCircleCreated",
+      MemberJoined: "./handlers/SavingsCircle.ts:handleMemberJoined",
+      ContributionMade: "./handlers/SavingsCircle.ts:handleContributionMade",
+      FundsLocked: "./handlers/SavingsCircle.ts:handleFundsLocked",
+      FundsUnlocked: "./handlers/SavingsCircle.ts:handleFundsUnlocked",
+      Withdrawal: "./handlers/SavingsCircle.ts:handleWithdrawal",
+    },
+  },
   schema: {
     Gift: {
       id: "string",

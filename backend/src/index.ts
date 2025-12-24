@@ -5,6 +5,7 @@ import { giftRoutes } from "./routes/gift.js";
 import { circleRoutes } from "./routes/circle.js";
 import { walletRoutes } from "./routes/wallet.js";
 import { telegramRoutes } from "./routes/telegram.js";
+import { envioRoutes } from "./routes/envio.js";
 import { setupTelegramBot } from "./telegram/bot.js";
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.use("/api/gift", giftRoutes);
 app.use("/api/circle", circleRoutes);
 app.use("/api/wallet", walletRoutes);
 app.use("/api/telegram", telegramRoutes);
+app.use("/api/envio", envioRoutes);
 
 // Health check
 app.get("/health", (req, res) => {

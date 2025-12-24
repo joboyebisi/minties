@@ -91,6 +91,33 @@ export async function contributeToCircle(
 }
 
 export async function getCircleStatus(circleId: string) {
+  // Try Envio first (faster, cheaper)
+  try {
+    const { getCircleDetails } = await import("./envio.js");
+    const details = await getCircleDetails(circleId);
+    if (details?.circle) {
+      const circle = details.circle;
+      return {
+        creator: circle.creator,
+        targetAmount: ethers.formatUnits(circle.targetAmount, 6),
+        lockPeriod: Number(circle.lockPeriod),
+        yieldPercentage: Number(circle.yieldPercentage) / 100,
+        totalContributed: ethers.formatUnits(circle.totalContributed, 6),
+        lockedAmount: ethers.formatUnits(circle.lockedAmount, 6),
+        lockEndTime: Number(circle.lockEndTime),
+        cycleNumber: Number(circle.cycleNumber),
+        isActive: circle.isActive,
+        memberCount: details.members.length,
+        // Additional Envio data
+        contributions: details.contributions,
+        members: details.members,
+      };
+    }
+  } catch (error) {
+    console.warn('Envio query failed, falling back to contract call:', error);
+  }
+
+  // Fallback to direct contract call
   const provider = getProvider();
   const contract = new ethers.Contract(SAVINGS_CIRCLE_ADDRESS, SAVINGS_CIRCLE_ABI, provider);
   

@@ -1,0 +1,14 @@
+{
+  "name": "minties-event-queries",
+  "version": "1.0.0",
+  "description": "Direct blockchain event queries for Minties (no indexer needed)",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Event queries are integrated in backend/src/services/events.ts\""
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0"
+  }
+}
+
