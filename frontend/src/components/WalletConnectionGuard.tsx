@@ -1,9 +1,9 @@
 "use client";
 
-import { useAccount, useWalletClient } from "wagmi";
-import { sepolia } from "wagmi/chains";
+import { useAccount } from "wagmi";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { NetworkSwitcher } from "./NetworkSwitcher";
+import { useWalletReady } from "@/hooks/useWalletReady";
 
 interface WalletConnectionGuardProps {
   children: React.ReactNode;
@@ -12,15 +12,11 @@ interface WalletConnectionGuardProps {
 
 /**
  * Wrapper component that shows user-friendly messages when wallet is not ready
- * Handles chain mismatches and wallet client availability
+ * Handles chain mismatches and wallet client availability with timeout protection
  */
 export function WalletConnectionGuard({ children, showMessage = true }: WalletConnectionGuardProps) {
-  const { isConnected, chain, chainId } = useAccount();
-  const { data: walletClient, isPending: walletClientPending, error: walletClientError } = useWalletClient();
-
-  const expectedChainId = sepolia.id;
-  const isWrongNetwork = isConnected && chainId !== expectedChainId;
-  const isWalletReady = isConnected && walletClient && !isWrongNetwork;
+  const { isConnected } = useAccount();
+  const { isReady, isLoading, isWrongNetwork, walletClient, error: walletClientError } = useWalletReady();
 
   // If wallet client has a chain mismatch error, show network switcher
   if (walletClientError?.message?.includes("chain") || isWrongNetwork) {
@@ -40,8 +36,8 @@ export function WalletConnectionGuard({ children, showMessage = true }: WalletCo
     );
   }
 
-  // If wallet is connecting/loading
-  if (isConnected && walletClientPending) {
+  // If wallet is connecting/loading - show message but allow interaction after timeout
+  if (isConnected && isLoading && !isReady) {
     return (
       <>
         {showMessage && (
@@ -52,6 +48,7 @@ export function WalletConnectionGuard({ children, showMessage = true }: WalletCo
             </div>
           </div>
         )}
+        {/* Still render children - don't block UI completely */}
         {children}
       </>
     );
