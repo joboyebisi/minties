@@ -43,7 +43,7 @@ async function queryEnvio<T>(query: string, variables?: Record<string, any>): Pr
       return null;
     }
 
-    const jsonData: unknown = await response.json();
+    const jsonData = await response.json() as unknown;
     const result = jsonData as EnvioQueryResult<T>;
 
     if (result.errors) {
