@@ -14,7 +14,7 @@ interface GiftClaimProps {
 
 export function GiftClaim({ onSuccess }: GiftClaimProps) {
   const { address, isConnected } = useAccount();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); // This is safe because parent page wraps in Suspense
   const { isTelegram, showMainButton, hideMainButton, hapticFeedback } = useTelegram();
   const { show } = useToast();
   
