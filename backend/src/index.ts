@@ -21,7 +21,16 @@ if (!botToken) {
   throw new Error("TELEGRAM_BOT_TOKEN is required");
 }
 
-const bot = new TelegramBot(botToken, { polling: true });
+// Polling with improved options to handle timeouts
+const bot = new TelegramBot(botToken, {
+  polling: {
+    interval: 300,
+    autoStart: true,
+    params: {
+      timeout: 10
+    }
+  }
+});
 setupTelegramBot(bot);
 
 // API Routes

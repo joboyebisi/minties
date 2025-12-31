@@ -1,35 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount } from "wagmi";
-import { useToast } from "@/components/ToastProvider";
-import { Send } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Send, ArrowRight } from "lucide-react";
 
 export function GiftSend() {
-  const { address, isConnected } = useAccount();
-  const { show } = useToast();
+  const router = useRouter();
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSend = async () => {
-    if (!isConnected || !address) {
-      show("error", "Connect wallet first");
-      return;
-    }
-    if (!recipient || !amount) {
-      show("error", "Enter recipient and amount");
-      return;
-    }
-    try {
-      setLoading(true);
-      // Placeholder: call backend to create a gift link or direct transfer
-      show("success", `Gift prepared for ${recipient} (${amount} USDC). Link ready to share.`);
-    } catch (e: any) {
-      show("error", e?.message || "Failed to send gift");
-    } finally {
-      setLoading(false);
-    }
+  const handleStart = () => {
+    const params = new URLSearchParams();
+    if (amount) params.set("amount", amount);
+    if (recipient) params.set("recipient", recipient);
+    router.push(`/gift/send?${params.toString()}`);
   };
 
   return (
@@ -56,16 +40,14 @@ export function GiftSend() {
         />
       </div>
       <button
-        className="btn-primary w-full text-center disabled:opacity-60"
-        disabled={loading || !isConnected}
-        onClick={handleSend}
+        className="btn-primary w-full text-center flex items-center justify-center gap-2"
+        onClick={handleStart}
       >
-        {loading ? "Preparing..." : "Send Gift Link"}
+        Send Gift <ArrowRight size={16} />
       </button>
       <p className="text-[11px] text-[#8da196]">
-        We’ll generate a shareable gift link for your recipient. Recurring flow will use permissions later.
+        Start here, then customize your gift and enable recurring options in the next step.
       </p>
     </div>
   );
 }
-

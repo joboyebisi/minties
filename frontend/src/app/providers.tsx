@@ -11,7 +11,7 @@ const config = createConfig({
   chains: [sepolia],
   connectors: [metaMask()],
   transports: {
-    [sepolia.id]: http(process.env.NEXT_PUBLIC_RPC_URL || "https://rpc.sepolia.org"),
+    [sepolia.id]: http(process.env.NEXT_PUBLIC_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com"),
   },
 });
 

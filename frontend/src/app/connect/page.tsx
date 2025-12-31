@@ -1,6 +1,7 @@
 "use client";
 
 import { useAccount } from "wagmi";
+import Link from "next/link";
 import { ConnectButton } from "@/components/ConnectButton";
 import { NavBar } from "@/components/NavBar";
 
@@ -13,6 +14,9 @@ export default function ConnectPage() {
       <div className="max-w-lg mx-auto px-4 py-8 md:px-6 md:py-10 space-y-6">
         <div className="card p-6 space-y-4">
           <div className="space-y-2">
+            <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#8da196] hover:text-[#e8fdf4] mb-2">
+              <span className="text-lg">←</span> Back home
+            </Link>
             <p className="badge w-fit">Wallet</p>
             <h1 className="text-3xl font-semibold text-[#e8fdf4]">Connect your wallet</h1>
             <p className="text-sm text-[#bfe8d7]">
