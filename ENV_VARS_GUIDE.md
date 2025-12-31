@@ -34,45 +34,54 @@ NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=minties_bot
 
 ---
 
-### Backend (Render/Railway/Netlify)
+### Backend (Fly.io)
 
-**Location**: Your hosting platform's environment variables section
+**Location**: Fly.io Dashboard → Your App → Secrets tab, or use CLI
 
-#### Render
-1. Go to your service dashboard
-2. Click **Environment** tab
-3. Add variables below
-4. Click **Save Changes**
+#### Using Fly.io CLI
+```bash
+cd backend
+flyctl secrets set KEY=value
+```
 
-#### Railway
-1. Go to your project dashboard
-2. Click **Variables** tab
-3. Add variables below
-4. Auto-saves
+#### Using Fly.io Dashboard
+1. Go to [fly.io dashboard](https://fly.io/dashboard)
+2. Select your app
+3. Go to **Secrets** tab
+4. Click **Add Secret**
+5. Enter **Key** and **Value**
+6. Click **Save**
+7. Repeat for each variable
 
 **Variables to Add**:
 ```env
+NODE_ENV=production
 TELEGRAM_BOT_TOKEN=your_bot_token_from_botfather
+SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+PRIVATE_KEY=your_private_key
 FRONTEND_URL=https://your-frontend.vercel.app
 SUPABASE_URL=https://xxxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJ... (service_role key, NOT anon key!)
-RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 USDC_ADDRESS=0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
 SAVINGS_CIRCLE_ADDRESS=your_deployed_contract_address
 GIFT_ESCROW_ADDRESS=your_deployed_contract_address
-# Optional: Envio HyperSync (for faster event queries)
-USE_HYPERSYNC=true
-HYPERSYNC_API_TOKEN=233b693d-8971-47ba-b30d-c4ce34d61f86
-HYPERSYNC_URL=https://sepolia.hypersync.xyz
+# Optional: Envio Indexer (for faster event queries)
+ENVIO_API_URL=https://your-envio-endpoint.graphql
+ENVIO_API_KEY=your_envio_api_key
+PORT=3001
 ```
+
+**Note**: `PORT` is set to 3001 by default in fly.toml, but you can override it if needed
 
 **For Local Development**: Create `backend/.env` file:
 ```env
+NODE_ENV=development
 TELEGRAM_BOT_TOKEN=your_bot_token
+SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+PRIVATE_KEY=your_private_key
 FRONTEND_URL=http://localhost:3000
 SUPABASE_URL=https://xxxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
-RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 USDC_ADDRESS=0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
 SAVINGS_CIRCLE_ADDRESS=your_contract_address
 GIFT_ESCROW_ADDRESS=your_contract_address

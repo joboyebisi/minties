@@ -52,8 +52,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 NEXT_PUBLIC_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 NEXT_PUBLIC_BUNDLER_URL=https://api.pimlico.io/v2/11155111/rpc
 
-# Backend API (update after Railway deployment)
-NEXT_PUBLIC_API_URL=https://your-railway-url.up.railway.app
+# Backend API (update after Fly.io deployment)
+NEXT_PUBLIC_API_URL=https://minties-backend.fly.dev
 
 # Contract Addresses
 NEXT_PUBLIC_USDC_ADDRESS=0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
@@ -94,10 +94,19 @@ After deployment:
 
 ## Step 7: Update Backend Configuration
 
-1. Go back to Railway dashboard
-2. Update `FRONTEND_URL` variable:
+### Using Fly.io CLI:
+```bash
+cd backend
+flyctl secrets set FRONTEND_URL=https://your-vercel-url.vercel.app
+```
+
+### Using Fly.io Dashboard:
+1. Go to Fly.io dashboard
+2. Select your backend app
+3. Go to **Secrets** tab
+4. Update `FRONTEND_URL`:
    - Value: `https://your-vercel-url.vercel.app`
-3. Railway will auto-redeploy
+5. App will auto-redeploy
 
 ## Step 8: Custom Domain (Optional)
 
@@ -148,8 +157,8 @@ After getting Vercel URL:
 
 ### "API request failed"
 - Check `NEXT_PUBLIC_API_URL` is set correctly
-- Verify Railway backend is running
-- Test backend health endpoint manually
+- Verify Fly.io backend is running: `flyctl status`
+- Test backend health endpoint manually: `curl https://minties-backend.fly.dev/health`
 
 ## Environment-Specific Deployments
 
@@ -163,7 +172,7 @@ You can set different environment variables for each.
 ## Next Steps
 
 After Vercel is set up:
-1. ✅ Update Railway `FRONTEND_URL`
+1. ✅ Update Fly.io `FRONTEND_URL` secret
 2. ✅ Set up Telegram bot (see Telegram guide)
 3. ✅ Test Mini App in Telegram
 4. ✅ Test end-to-end functionality

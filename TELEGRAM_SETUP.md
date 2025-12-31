@@ -83,15 +83,24 @@ BotFather will ask:
 
 This creates a button in your bot that opens the Mini App.
 
-## Step 5: Add Bot Token to Railway
+## Step 5: Add Bot Token to Fly.io
 
-1. Go to Railway dashboard
-2. Open your backend service
-3. Go to **"Variables"** tab
-4. Add variable:
+### Using CLI:
+```bash
+cd backend
+flyctl secrets set TELEGRAM_BOT_TOKEN=your_bot_token_from_botfather
+```
+
+### Using Dashboard:
+1. Go to [fly.io dashboard](https://fly.io/dashboard)
+2. Select your backend app
+3. Go to **"Secrets"** tab
+4. Click **"Add Secret"**
+5. Add:
    - **Name**: `TELEGRAM_BOT_TOKEN`
    - **Value**: Your bot token from BotFather
-5. Railway will auto-redeploy
+6. Click **"Save"**
+7. App will auto-redeploy
 
 ## Step 6: Test Bot
 
@@ -119,34 +128,38 @@ If you want users to add the bot to groups:
 
 ## Step 9: Set Up Webhook (Alternative to Polling)
 
-**Note**: Your current setup uses polling. For production, consider webhooks:
+**Note**: Your current setup uses polling. For production, webhooks are recommended for better performance:
 
-### Webhook Setup (Optional)
+### Webhook Setup (Recommended for Production)
 
-1. Get your Railway backend URL
+1. Get your Fly.io backend URL (e.g., `https://minties-backend.fly.dev`)
 2. Set webhook:
    ```bash
-   curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://your-railway-url.up.railway.app/api/telegram/webhook"
+   curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://minties-backend.fly.dev/api/telegram/webhook"
    ```
 
 3. Update `backend/src/index.ts` to use webhooks instead of polling:
    ```typescript
    // Remove: { polling: true }
-   // Add webhook handling
+   // Add webhook endpoint
+   app.post('/api/telegram/webhook', (req, res) => {
+     bot.processUpdate(req.body);
+     res.sendStatus(200);
+   });
    ```
 
-**For now, polling works fine for development.**
+**For development, polling works fine. For production, webhooks are more efficient.**
 
 ## Troubleshooting
 
 ### Bot Not Responding
-- Verify `TELEGRAM_BOT_TOKEN` is correct in Railway
-- Check Railway logs for errors
+- Verify `TELEGRAM_BOT_TOKEN` is correct in Fly.io secrets
+- Check Fly.io logs: `flyctl logs`
 - Test token: `curl https://api.telegram.org/bot<TOKEN>/getMe`
 - Should return bot info if token is valid
 
 ### Mini App Not Opening
-- Verify `FRONTEND_URL` in Railway matches Vercel URL exactly
+- Verify `FRONTEND_URL` in Fly.io secrets matches Vercel URL exactly
 - Check BotFather Menu Button URL is correct
 - Ensure URL starts with `https://`
 - Test URL in browser first
@@ -165,8 +178,8 @@ If you want users to add the bot to groups:
 ### Polling Errors
 - Check network connectivity
 - Verify bot token is valid
-- Check Railway logs for specific errors
-- Consider switching to webhooks for production
+- Check Fly.io logs: `flyctl logs`
+- Consider switching to webhooks for production (more efficient)
 
 ## Bot Commands Reference
 
@@ -206,12 +219,13 @@ Monitor your bot:
 
 ## Production Checklist
 
-- [ ] Bot token set in Railway
+- [ ] Bot token set in Fly.io secrets
 - [ ] Bot description and about text set
 - [ ] Bot commands configured
 - [ ] Menu button URL set to Vercel URL
-- [ ] `FRONTEND_URL` in Railway matches Vercel URL
+- [ ] `FRONTEND_URL` in Fly.io secrets matches Vercel URL
 - [ ] Bot responds to `/start` command
 - [ ] Mini App opens correctly
 - [ ] All features tested end-to-end
+- [ ] Consider switching to webhooks for production (better performance)
 

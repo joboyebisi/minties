@@ -14,7 +14,9 @@ const SAVINGS_CIRCLE_ABI = [
 
 export async function createCircle(
   userId: string,
-  targetAmount: number
+  targetAmount: number,
+  lockPeriod?: number, // in seconds
+  yieldPercentage?: number // in basis points (500 = 5%)
 ): Promise<string> {
   const wallet = await getWalletForUser(userId);
   if (!wallet) {
@@ -26,10 +28,10 @@ export async function createCircle(
   
   const circleId = ethers.id(`${userId}_${Date.now()}`);
   const targetAmountWei = ethers.parseUnits(targetAmount.toString(), 6);
-  const lockPeriod = 7 * 24 * 60 * 60; // 7 days in seconds
-  const yieldPercentage = 500; // 5% in basis points
+  const lockPeriodSeconds = lockPeriod || (7 * 24 * 60 * 60); // Default: 7 days in seconds
+  const yieldBasisPoints = yieldPercentage || 500; // Default: 5% in basis points
 
-  const tx = await contract.createCircle(circleId, targetAmountWei, lockPeriod, yieldPercentage);
+  const tx = await contract.createCircle(circleId, targetAmountWei, lockPeriodSeconds, yieldBasisPoints);
   await tx.wait();
 
   return circleId;

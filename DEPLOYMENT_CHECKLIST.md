@@ -13,21 +13,21 @@ Use this checklist to ensure everything is set up correctly.
 - [ ] Bot token saved
 - [ ] GitHub repository pushed with all code
 
-## Railway (Backend) Setup
+## Render (Backend) Setup
 
-- [ ] Railway account created
-- [ ] Project created from GitHub repo
-- [ ] Service configured with root directory: `backend`
+- [ ] Render account created
+- [ ] Web Service created from GitHub repo
+- [ ] Root directory set to: `backend`
 - [ ] Build command: `npm install && npm run build`
 - [ ] Start command: `npm start`
 - [ ] All environment variables added:
-  - [ ] `PORT=3001`
   - [ ] `NODE_ENV=production`
   - [ ] `TELEGRAM_BOT_TOKEN=...`
+  - [ ] `SEPOLIA_RPC_URL=...`
+  - [ ] `PRIVATE_KEY=...`
   - [ ] `FRONTEND_URL=...` (update after Vercel)
   - [ ] `SUPABASE_URL=...`
   - [ ] `SUPABASE_SERVICE_ROLE_KEY=...`
-  - [ ] `RPC_URL=...`
   - [ ] `USDC_ADDRESS=...`
   - [ ] `SAVINGS_CIRCLE_ADDRESS=...`
   - [ ] `GIFT_ESCROW_ADDRESS=...`
@@ -35,7 +35,7 @@ Use this checklist to ensure everything is set up correctly.
   - [ ] `HYPERSYNC_API_TOKEN=...`
   - [ ] `HYPERSYNC_URL=...`
 - [ ] Deployment successful
-- [ ] Backend URL obtained (e.g., `https://xxx.up.railway.app`)
+- [ ] Backend URL obtained (e.g., `https://xxx.onrender.com`)
 - [ ] Health check works: `/health` endpoint returns OK
 
 ## Vercel (Frontend) Setup
@@ -85,6 +85,7 @@ Use this checklist to ensure everything is set up correctly.
 - [ ] API routes accessible
 - [ ] Supabase connection works
 - [ ] Blockchain queries work
+- [ ] Service doesn't spin down (or use cron to keep alive)
 
 ### Frontend Tests
 - [ ] Frontend loads without errors
@@ -142,9 +143,9 @@ Use this checklist to ensure everything is set up correctly.
 
 ## Quick Reference
 
-### Railway Backend URL
+### Render Backend URL
 ```
-https://your-backend.up.railway.app
+https://your-backend.onrender.com
 ```
 
 ### Vercel Frontend URL
@@ -168,7 +169,7 @@ curl https://api.telegram.org/bot<TOKEN>/getMe
 
 ## Support Resources
 
-- Railway Docs: https://docs.railway.app
+- Render Docs: https://render.com/docs
 - Vercel Docs: https://vercel.com/docs
 - Telegram Bot API: https://core.telegram.org/bots/api
 - Supabase Docs: https://supabase.com/docs

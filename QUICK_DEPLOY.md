@@ -4,18 +4,20 @@
 
 Follow these steps in order:
 
-### 1. Railway (Backend) - Do First
+### 1. Render (Backend) - Do First
 **Time**: ~10 minutes
 
-1. Go to [railway.app](https://railway.app) → Sign in with GitHub
-2. **New Project** → **Deploy from GitHub repo** → Select `minties`
-3. **New Service** → Select your repo
-4. **Settings** → Set **Root Directory**: `backend`
-5. **Variables** → Add all backend env vars (see `RAILWAY_SETUP.md`)
-6. Wait for deployment
-7. Copy backend URL (e.g., `https://xxx.up.railway.app`)
+1. Go to [render.com](https://render.com) → Sign in with GitHub
+2. **New +** → **Web Service** → Connect `minties` repo
+3. **Settings** → Set **Root Directory**: `backend`
+4. **Build Command**: `npm install && npm run build`
+5. **Start Command**: `npm start`
+6. **Environment** → Add all backend env vars (see `RENDER_SETUP.md`)
+7. Click **Create Web Service**
+8. Wait for deployment
+9. Copy backend URL (e.g., `https://xxx.onrender.com`)
 
-**See**: `RAILWAY_SETUP.md` for detailed steps
+**See**: `RENDER_SETUP.md` for detailed steps
 
 ---
 
@@ -26,7 +28,7 @@ Follow these steps in order:
 2. **Add New** → **Project** → Import `minties` repo
 3. **Configure** → Set **Root Directory**: `frontend`
 4. **Environment Variables** → Add all frontend vars (see `VERCEL_SETUP.md`)
-   - **Important**: Set `NEXT_PUBLIC_API_URL` to your Railway URL
+   - **Important**: Set `NEXT_PUBLIC_API_URL` to your Render URL
 5. Click **Deploy**
 6. Copy frontend URL (e.g., `https://xxx.vercel.app`)
 
@@ -37,8 +39,8 @@ Follow these steps in order:
 ### 3. Update Cross-References
 **Time**: ~2 minutes
 
-1. **Railway**: Update `FRONTEND_URL` variable with Vercel URL
-2. **Vercel**: Verify `NEXT_PUBLIC_API_URL` is set to Railway URL
+1. **Render**: Update `FRONTEND_URL` variable with Vercel URL
+2. **Vercel**: Verify `NEXT_PUBLIC_API_URL` is set to Render URL
 3. Both will auto-redeploy
 
 ---
@@ -59,16 +61,16 @@ Follow these steps in order:
 
 ## 📋 Environment Variables Quick Reference
 
-### Railway (Backend) - All Required
+### Render (Backend) - All Required
 
 ```env
-PORT=3001
 NODE_ENV=production
 TELEGRAM_BOT_TOKEN=your_token
+SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+PRIVATE_KEY=your_private_key
 FRONTEND_URL=https://your-frontend.vercel.app
 SUPABASE_URL=https://xxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
-RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 USDC_ADDRESS=0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
 SAVINGS_CIRCLE_ADDRESS=0x...
 GIFT_ESCROW_ADDRESS=0x...
@@ -76,6 +78,8 @@ USE_HYPERSYNC=true
 HYPERSYNC_API_TOKEN=233b693d-8971-47ba-b30d-c4ce34d61f86
 HYPERSYNC_URL=https://sepolia.hypersync.xyz
 ```
+
+**Note**: Don't set `PORT` - Render sets it automatically (usually `10000`)
 
 ### Vercel (Frontend) - All Required
 
@@ -123,9 +127,10 @@ After deployment, verify:
 ## 🆘 Quick Troubleshooting
 
 **Backend not starting?**
-- Check Railway logs
+- Check Render logs
 - Verify all env vars are set
 - Check `TELEGRAM_BOT_TOKEN` is valid
+- Verify Root Directory is set to `backend`
 
 **Frontend build fails?**
 - Check Vercel build logs
@@ -146,7 +151,7 @@ After deployment, verify:
 
 ## 📚 Detailed Guides
 
-- **Railway**: See `RAILWAY_SETUP.md`
+- **Render**: See `RENDER_SETUP.md`
 - **Vercel**: See `VERCEL_SETUP.md`
 - **Telegram**: See `TELEGRAM_SETUP.md`
 - **Complete Checklist**: See `DEPLOYMENT_CHECKLIST.md`
@@ -156,7 +161,7 @@ After deployment, verify:
 
 ## ⏱️ Total Time
 
-- Railway setup: ~10 minutes
+- Render setup: ~10 minutes
 - Vercel setup: ~10 minutes
 - Telegram setup: ~5 minutes
 - Testing: ~10 minutes

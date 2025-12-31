@@ -13,7 +13,7 @@ interface Step {
 interface MultiStepFlowProps {
   steps: Step[];
   currentStep: number;
-  onStepChange: (step: number) => void;
+  onStepChange: (step: number) => void | Promise<void>;
   onComplete?: () => void;
   showProgress?: boolean;
   canGoBack?: boolean;
@@ -30,11 +30,11 @@ export function MultiStepFlow({
   const isLastStep = currentStep === steps.length - 1;
   const isFirstStep = currentStep === 0;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isLastStep) {
       onComplete?.();
     } else {
-      onStepChange(currentStep + 1);
+      await onStepChange(currentStep + 1);
     }
   };
 

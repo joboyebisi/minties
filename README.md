@@ -31,7 +31,7 @@ Start savings circles with friends. Set weekly targets, contribute together, and
 - MetaMask wallet
 - Telegram account
 - Supabase account (for database)
-- Railway account (for backend hosting)
+- Fly.io account (for backend hosting)
 - Vercel account (for frontend hosting)
 
 ### Installation

@@ -6,8 +6,8 @@ export const circleRoutes = Router();
 // Create a savings circle
 circleRoutes.post("/create", async (req, res) => {
   try {
-    const { userId, targetAmount } = req.body;
-    const circleId = await createCircle(userId, targetAmount);
+    const { userId, targetAmount, lockPeriod, yieldPercentage } = req.body;
+    const circleId = await createCircle(userId, targetAmount, lockPeriod, yieldPercentage);
     res.json({ success: true, circleId });
   } catch (error: any) {
     res.status(400).json({ success: false, error: error.message });
