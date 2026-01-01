@@ -1,7 +1,7 @@
 import { HypersyncClient } from "@envio-dev/hypersync-client";
 
 // HyperSync Client Setup
-export const hyperSyncClient = HypersyncClient.new({
+export const hyperSyncClient = new HypersyncClient({
     url: process.env.HYPERSYNC_URL || "https://sepolia.hypersync.xyz",
     apiToken: process.env.HYPERSYNC_API_TOKEN || "233b693d-8971-47ba-b30d-c4ce34d61f86",
 });
@@ -17,7 +17,7 @@ export async function fetchContractEvents(contractAddress: string, eventSignatur
                 topics: [[eventSignature]]
             }],
             fieldSelection: {
-                log: ["block_number", "log_index", "transaction_index", "data", "address", "topic0", "topic1", "topic2", "topic3"]
+                log: ["block_number", "log_index", "transaction_index", "data", "address", "topic0", "topic1", "topic2", "topic3"] as any
             }
         };
 
@@ -31,9 +31,6 @@ export async function fetchContractEvents(contractAddress: string, eventSignatur
 
 export async function getWalletHistory(address: string) {
     try {
-        // Query last 1M blocks or so? Or scan reverse?
-        // Envio supports reverse scan? Docs say yes `stream(query, { reverse: true })`
-        // We'll try a simple get for now.
         const query = {
             fromBlock: 0,
             transactions: [
@@ -41,7 +38,7 @@ export async function getWalletHistory(address: string) {
                 { to: [address] }
             ],
             fieldSelection: {
-                transaction: ["hash", "from", "to", "value", "block_number", "timestamp"]
+                transaction: ["hash", "from", "to", "value", "block_number", "timestamp"] as any
             }
         };
 
