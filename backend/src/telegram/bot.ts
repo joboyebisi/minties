@@ -3,13 +3,14 @@ import { handleGiftCommands } from "./handlers/gift.js";
 import { handleCircleCommands } from "./handlers/circle.js";
 import { handleWalletCommands } from "./handlers/wallet.js";
 import { handleInviteCommands } from "./handlers/invite.js";
+import { supabase } from "../lib/supabase.js";
 
 export function setupTelegramBot(bot: TelegramBot) {
   // Start command
   bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-    
+
     // Send welcome message with Mini App button
     await bot.sendMessage(chatId, "🎁 Welcome to Minties!", {
       reply_markup: {
@@ -41,7 +42,7 @@ Commands:
   bot.onText(/\/webapp/, async (msg) => {
     const chatId = msg.chat.id;
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-    
+
     await bot.sendMessage(chatId, "Opening Minties Mini App...", {
       reply_markup: {
         inline_keyboard: [
@@ -85,10 +86,10 @@ Need help? Contact support: @mintiessupport
 
   // Gift commands
   bot.onText(/\/gift/, handleGiftCommands(bot));
-  
+
   // Circle commands
   bot.onText(/\/circle/, handleCircleCommands(bot));
-  
+
   // Wallet commands
   bot.onText(/\/wallet/, handleWalletCommands(bot));
 
@@ -126,9 +127,9 @@ Need help? Contact support: @mintiessupport
       try {
         const data = JSON.parse(msg.web_app_data.data);
         const chatId = msg.chat.id;
-        
+
         console.log("Received data from Mini App:", data);
-        
+
         // Handle different types of data from Mini App
         if (data.type === "gift_claimed") {
           await bot.sendMessage(
@@ -167,6 +168,59 @@ Need help? Contact support: @mintiessupport
   // Error handling
   bot.on("polling_error", (error) => {
     console.error("Telegram bot polling error:", error);
+  });
+
+  // Configure Menu Button
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+  try {
+    // @ts-ignore - setChatMenuButton might not be in typed definition yet
+    bot.setChatMenuButton({
+      menu_button: {
+        type: "web_app",
+        text: "Launch App",
+        web_app: { url: frontendUrl }
+      }
+    });
+  } catch (error) {
+    console.warn("Failed to set menu button:", error);
+  }
+
+  // Handle Contact Sharing
+  bot.on("contact", async (msg) => {
+    const chatId = msg.chat.id;
+    const contact = msg.contact;
+
+    if (!contact || !msg.from) return;
+
+    // Verify contact belongs to sender (security check)
+    if (contact.user_id !== msg.from.id) {
+      await bot.sendMessage(chatId, "⚠️ Please share your own contact.");
+      return;
+    }
+
+    try {
+      if (supabase) {
+        // Sync to Supabase
+        const { error } = await supabase.from('contacts').upsert({
+          telegram_user_id: contact.user_id,
+          phone_number: contact.phone_number,
+          first_name: contact.first_name,
+          last_name: contact.last_name,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'telegram_user_id' });
+
+        if (error) throw error;
+
+        await bot.sendMessage(chatId, "✅ Contact synced! You can now be discovered by friends in Minties.", {
+          reply_markup: { remove_keyboard: true }
+        });
+      } else {
+        await bot.sendMessage(chatId, "⚠️ Backend database not connected. Contact not saved.");
+      }
+    } catch (err) {
+      console.error("Error syncing contact:", err);
+      await bot.sendMessage(chatId, "❌ Failed to sync contact. Please try again.");
+    }
   });
 
   console.log("✅ Telegram bot handlers registered");

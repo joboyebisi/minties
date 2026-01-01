@@ -2,51 +2,44 @@
 
 import React, { useEffect, useState as useReactState } from "react";
 import Link from "next/link";
-import { useAccount, useWalletClient, useChainId } from "wagmi";
-import { sepolia } from "wagmi/chains";
+import { useAccount, useWalletClient } from "wagmi";
 import { ConnectButton } from "@/components/ConnectButton";
-import { GiftClaim } from "@/components/GiftClaim";
-import { SavingsCircle } from "@/components/SavingsCircle";
 import { useTelegram } from "@/hooks/useTelegram";
-import { NavBar } from "@/components/NavBar";
 import { CTASection } from "@/components/CTASection";
 import { FAQ } from "@/components/FAQ";
-import { GamificationPanel } from "@/components/GamificationPanel";
 import { WalletStatus } from "@/components/WalletStatus";
-import { WalletConnectionGuard } from "@/components/WalletConnectionGuard";
-import { Gift, PiggyBank, Send, Sparkles, Calculator, Target, Users, ArrowRight } from "lucide-react";
-import { fetchAaveApy, supplyUsdc, withdrawUsdc } from "@/lib/aave";
-import { useToast } from "@/components/ToastProvider";
-import { awardPoints, getOrCreateUserProfile, updateStreak } from "@/lib/gamification";
-
+import { PiggyBank, Calculator, Target, ArrowRight } from "lucide-react";
+import { fetchAaveApy } from "@/lib/aave";
 import { useRouter } from "next/navigation";
-import { UserDashboard } from "@/components/UserDashboard"; // Import the new dashboard
-// ... existing imports ... (ensure UserDashboard isn't double imported if auto-added)
+import { UserDashboard } from "@/components/UserDashboard";
 
 export default function Home() {
   const { isTelegram, user } = useTelegram();
   const { isConnected } = useAccount();
-  const { data: walletClient } = useWalletClient();
 
   if (isConnected) {
     return (
       <main className="min-h-screen">
-        <NavBar />
         <div className="max-w-5xl mx-auto px-4 py-8 md:px-6 md:py-10 space-y-10">
           <UserDashboard />
 
-          {/* Feature Discovery (reduced visibility when dashboard is active) */}
+          {/* Feature Discovery */}
           <div className="border-t border-[#1e2a24] pt-8 mt-8">
             <h3 className="text-xl font-semibold text-[#e8fdf4] mb-4">Explore Features</h3>
-            <section id="features" className="grid sm:grid-cols-2 gap-4">
-              <ActionCard
-                title="💰 Savings Circle"
-                icon={<PiggyBank size={18} className="text-[#30f0a8]" />}
-                body="Start a savings circle with friends."
-                cta="Start Circle"
-                content={<div className="text-sm text-[#bfe8d7]">Create a group goal, set recurring contributions, and track progress together.</div>}
-                onCta={() => window.location.href = '/circle/create'} // Simple redirect
-              />
+            <section id="features" className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <ActionCard
+                  title="💰 Savings Circle"
+                  icon={<PiggyBank size={18} className="text-[#30f0a8]" />}
+                  body="Start a savings circle with friends."
+                  cta="Start Circle"
+                  content={<div className="text-sm text-[#bfe8d7]">Create a group goal, set recurring contributions, and track progress together.</div>}
+                  onCta={() => window.location.href = '/circle/create'}
+                />
+                {/* Moving gifts here to balance height */}
+                <CTASection />
+              </div>
+
               <ActionCard
                 title="📈 Money Box Calculator"
                 icon={<Calculator size={18} className="text-[#30f0a8]" />}
@@ -65,7 +58,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      <NavBar />
       <div className="max-w-5xl mx-auto px-4 py-8 md:px-6 md:py-10 space-y-10">
         {/* Hero */}
         <div className="text-center space-y-4">
@@ -100,7 +92,6 @@ export default function Home() {
 
         {/* Money Box + Gifts */}
         <section id="moneybox" className="space-y-4">
-          {/* Removed WalletConnectionGuard here to allow calculator usage without wallet */}
           <ActionCard
             title="📈 Money Box (with yield)"
             icon={<Calculator size={18} className="text-[#30f0a8]" />}
@@ -108,7 +99,6 @@ export default function Home() {
             cta="Star Saving Goal"
             content={<MoneyBoxCalculator />}
           />
-          {/* Gifts card immediately under Money Box */}
           <CTASection />
         </section>
 
@@ -171,10 +161,6 @@ function ActionCard({
       <div className="space-y-3">
         <div>{content}</div>
         <div className="flex justify-end">
-          {/* If content is a custom component like MoneyBoxCalculator, it handles its own button. 
-                 But ActionCard has a badge 'cta' - maybe we should make it clickable? 
-                 The current design had a 'badge' span. I'll make it a button if onCta provided.
-             */}
           {onCta ? (
             <button onClick={onCta} className="btn-secondary text-sm px-3 py-1">
               {cta}
@@ -225,7 +211,6 @@ function MoneyBoxCalculator() {
   const totalWithYield = amount + projectedYield;
 
   const handleStart = () => {
-    // Direct to create page with params
     const params = new URLSearchParams();
     params.set('amount', amount.toString());
     params.set('months', months.toString());
@@ -296,4 +281,3 @@ function Stat({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-

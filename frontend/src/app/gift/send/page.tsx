@@ -71,6 +71,15 @@ export default function SendGiftPage() {
 
             setGiftId(id);
             setShareLink(link);
+
+            // Save to local storage for dashboard
+            const { saveItem } = await import("@/lib/local-db");
+            saveItem("gifts", {
+                id: id,
+                amount: parseFloat(formData.amount),
+                recipient: formData.recipient || "Anyone"
+            });
+
             setStep("success");
             show("success", "Gift created! Share the link.");
 

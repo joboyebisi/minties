@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { useSearchParams } from "next/navigation";
 import { claimGift } from "@/lib/gift";
 import { useTelegram } from "@/hooks/useTelegram";
@@ -14,10 +14,11 @@ interface GiftClaimProps {
 
 export function GiftClaim({ onSuccess }: GiftClaimProps) {
   const { address, isConnected } = useAccount();
+  const { data: walletClient } = useWalletClient();
   const searchParams = useSearchParams(); // This is safe because parent page wraps in Suspense
   const { isTelegram, showMainButton, hideMainButton, hapticFeedback } = useTelegram();
   const { show } = useToast();
-  
+
   // Get delegation from URL if present
   const delegationParam = searchParams?.get("delegation");
   const [giftLink, setGiftLink] = useState("");
@@ -36,7 +37,7 @@ export function GiftClaim({ onSuccess }: GiftClaimProps) {
     } else {
       hideMainButton();
     }
-    
+
     return () => {
       hideMainButton();
     };
@@ -65,26 +66,38 @@ export function GiftClaim({ onSuccess }: GiftClaimProps) {
     }
 
     try {
-      const userId = address; // Use address as userId for now
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/gift/claim`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, link: giftLink }),
+      // Parse ID from link or input
+      // Assuming link format: .../claim?id=0x... or just the ID itself
+      let idToClaim = giftLink;
+      try {
+        const url = new URL(giftLink);
+        const id = url.searchParams.get("id");
+        if (id) idToClaim = id;
+      } catch (e) {
+        // not a url, treat as ID
+      }
+
+      // Check if it looks like a bytes32 hex
+      if (!idToClaim.startsWith("0x") || idToClaim.length !== 66) {
+        throw new Error("Invalid Gift ID. Please check the link.");
+      }
+
+      const { claimGift } = await import("@/lib/transactions");
+
+      const { hash } = await claimGift({
+        walletClient,
+        giftId: idToClaim,
+        password: ""
       });
 
-      const data = await response.json();
-      if (data.success) {
-        setResult(`✅ Gift claimed! Amount: ${data.amount} USDC`);
-        show("success", `Gift claimed: ${data.amount} USDC`);
-        if (isTelegram) hapticFeedback.notification("success");
-        if (onSuccess) {
-          onSuccess({ amount: data.amount, txHash: data.txHash || "" });
-        }
-      } else {
-        setResult(`❌ Error: ${data.error}`);
-        show("error", data.error || "Claim failed");
-        if (isTelegram) hapticFeedback.notification("error");
+      setResult(`✅ Gift claimed! Check wallet.`);
+      show("success", `Transaction sent!`);
+      if (isTelegram) hapticFeedback.notification("success");
+
+      if (onSuccess) {
+        onSuccess({ amount: "Verified On-Chain", txHash: hash });
       }
+
     } catch (error: any) {
       setResult(`❌ Error: ${error.message}`);
       show("error", error.message || "Claim failed");
@@ -120,7 +133,7 @@ export function GiftClaim({ onSuccess }: GiftClaimProps) {
         <p className="text-sm text-[#bfe8d7]">{result}</p>
       )}
       {!isConnected && (
-        <p className="text-sm text-[#facc15]">Connect wallet to claim</p>
+        <p className="text-sm text-[#facc15]">Enter the secret code shared with you</p>
       )}
     </div>
   );

@@ -16,6 +16,7 @@ export interface UserProfile {
   id: string;
   telegram_user_id?: number;
   wallet_address?: string;
+  display_name?: string; // Added display_name
   smart_account_address?: string;
   points: number;
   level: number;
@@ -72,3 +73,87 @@ export interface GiftRecord {
   created_at: string;
 }
 
+export async function getProfile(walletAddress: string): Promise<UserProfile | null> {
+  if (!supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('wallet_address', walletAddress)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null; // Not found
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    return null;
+  }
+}
+
+export async function updateProfile(walletAddress: string, updates: Partial<UserProfile>): Promise<UserProfile | null> {
+  if (!supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .upsert({
+        wallet_address: walletAddress,
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    return null;
+  }
+}
+
+// --- Features Persistence ---
+
+export async function saveMoneyBox(box: any) {
+  if (!supabase) return null;
+  const { error } = await supabase.from('money_boxes').insert(box);
+  if (error) console.error("Error saving money box:", error);
+  return !error;
+}
+
+export async function getUserMoneyBoxes(address: string) {
+  if (!supabase) return [];
+  const { data } = await supabase.from('money_boxes').select('*').eq('owner', address);
+  return data || [];
+}
+
+export async function saveCircle(circle: any) {
+  if (!supabase) return null;
+  const { error } = await supabase.from('savings_circles').insert(circle);
+  if (error) console.error("Error saving circle:", error);
+  return !error;
+}
+
+export async function getCircles() {
+  if (!supabase) return [];
+  const { data } = await supabase.from('savings_circles').select('*');
+  return data || [];
+}
+
+export async function saveGift(gift: any) {
+  if (!supabase) return null;
+  const { error } = await supabase.from('gifts').insert(gift);
+  if (error) console.error("Error saving gift:", error);
+  return !error;
+}
+
+export async function getUserGifts(address: string) {
+  if (!supabase) return [];
+  const { data } = await supabase.from('gifts').select('*').eq('sender', address);
+  return data || [];
+}

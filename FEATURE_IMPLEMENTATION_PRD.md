@@ -162,17 +162,34 @@ This PRD outlines the comprehensive implementation of multi-step flows, wallet e
 - Cache token metadata (icons, decimals, symbols)
 - Price oracle integration (CoinGecko or similar)
 
-### 2.2 Wallet View Component
+### 2.2 Wallet View Component & User Dashboard
 
-**Location:** `/connect` page or new `/wallet` page
+**Location:** `/connect` page, Dashboard, and `WalletStatus`
 
 **Features:**
-- Connected address display with copy button
-- Network switcher
-- Multi-chain balance cards
-- Token list with balances
-- Transaction history link
-- Quick actions (send, receive, swap)
+- **Identity:** Welcome user by Telegram name (if available) or Wallet ID (e.g., "Welcome, 0x123...").
+- **Balances:** Display real-time balances for ETH and supported tokens (USDC, DAI).
+  - Show "Preparing wallet..." only during actual connection.
+  - Help text if balance is low or network is wrong.
+- **Activity Feed:** 
+  - Pull real data from Envio/Supabase.
+  - If empty, show "You don't have any activities yet, start one by [Action]"
+- **Integration:** 
+  - Back button on all detailed views.
+  - Sticky/Fixed Navbar for consistent navigation.
+
+### 2.3 Onboarding Improvements
+
+**Features:**
+- **Default Goal:** Auto-create a sample "Dream Vacation" MoneyBox for new users.
+  - Allow customization or deletion.
+  - Serve as a tutorial/template.
+- **Smart Account Identity:** Verify if MetaMask Smart Account provides a label/name, otherwise fallback to Telegram/Address.
+
+---
+
+## 3. Swap & Bridge Integration
+
 
 ---
 
@@ -299,9 +316,33 @@ This PRD outlines the comprehensive implementation of multi-step flows, wallet e
 - Process data in bot's message handler
 
 **Examples:**
-- `/gift create` → Opens Mini App at `/gift/send`
-- `/circle create` → Opens Mini App at `/circle/create`
-- `/wallet` → Opens Mini App at `/connect`
+### 4.4 Feature Parity & Native Improvements
+
+**Requirements:**
+- **Contact Sync:** Allow users to share Telegram contacts with the bot, sync to Supabase, and display in WebApp for easy gifting/circle addition.
+- **Menu Button Launch:** Ensure the Bot Menu Button opens the webapp directly (replacing `/start` dependency).
+- **Deep Linking:** Robust handling of `startapp` params.
+
+### 4.5 Business Logic Audit
+
+**Goal:** Ensure verified completion of all planned features.
+- [ ] **Transactions:** Verify UI calls `transactions.ts` with real contracts.
+- [ ] **Permissions:** Verify recurring permissions are stored/redeemable.
+- [ ] **Data:** Verify Activity Feed pulls from Indexer/DB.
+
+### 4.4 Feature Parity & Native Improvements
+
+**Requirements:**
+- **Contact Sync:** Allow users to share Telegram contacts with the bot, sync to Supabase, and display in WebApp for easy gifting/circle addition.
+- **Menu Button Launch:** Ensure the Bot Menu Button opens the webapp directly (replacing `/start` dependency).
+- **Deep Linking:** Robust handling of `startapp` params.
+
+### 4.5 Business Logic Audit
+
+**Goal:** Ensure verified completion of all planned features.
+- [ ] **Transactions:** Verify UI calls `transactions.ts` with real contracts.
+- [ ] **Permissions:** Verify recurring permissions are stored/redeemable.
+- [ ] **Data:** Verify Activity Feed pulls from Indexer/DB.
 
 ---
 

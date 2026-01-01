@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import { TelegramWrapper } from "@/components/TelegramWrapper";
 import Script from "next/script";
 import { ToastProvider } from "@/components/ToastProvider";
+import { NavBar } from "@/components/NavBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,7 +35,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <ToastProvider>
-            <TelegramWrapper>{children}</TelegramWrapper>
+            <TelegramWrapper>
+              <NavBar />
+              {children}
+            </TelegramWrapper>
           </ToastProvider>
         </Providers>
       </body>

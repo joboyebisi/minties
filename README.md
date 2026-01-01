@@ -1,135 +1,101 @@
 # Minties - MoneyBox, Crypto Gifts & Savings Circles
 
-A Telegram Mini App for crypto savings, gifts, and yield earning. Save towards targets with friends, send USDC gifts, and earn yield—all in one interface.
+<div align="center">
+  <img src="frontend/public/images/logo.png" alt="Minties Logo" width="120" />
+  <h3>Save, Gift, and Earn Crypto with Friends</h3>
+</div>
 
-## Features
+A **Telegram Mini App** for crypto savings, gifts, and yield earning. Built with **MetaMask Smart Accounts** for a seamless, gasless experience.
+
+## 🚀 Features
 
 ### 💰 Money Box
-Target savings with high yield. Set your savings goal, contribute regularly, and earn yield on your deposits through Aave DeFi integration.
+Target savings with high yield.
+- **Aave Integration**: Automatically deposit savings into Aave V3 (Sepolia) to earn yield.
+- **Recurring Savings**: Set up auto-save rules (e.g., 50 USDC/month) using ERC-7715 permissions.
+- **Visual Progress**: Track your goal with real-time progress bars.
 
 ### 🎁 Crypto Gifts
-Send USDC as gifts with claimable links. Create one-time or recurring gifts that recipients can claim directly in Telegram.
+Send USDC as gifts with claimable links.
+- **Escrow Contracts**: Funds are held securely on-chain until claimed.
+- **Social Sharing**: Generate a unique link to share via Telegram or other chats.
+- **Gasless Claiming**: Recipients can claim even with empty wallets (via Relayers, simplified for demo).
 
 ### 👥 Savings Circles
-Start savings circles with friends. Set weekly targets, contribute together, and earn yield on locked funds. Perfect for group savings goals.
+Social saving with friends.
+- **Pooled Funds**: Contribute together towards a shared goal (e.g., "Group Trip").
+- **Yield Generating**: Circle funds earn DeFi yield while locked.
+- **Transparent**: View all participants and contributions.
 
-## Tech Stack
+## 🛠 Tech Stack
 
-- **Smart Contracts**: Solidity, Hardhat (Ethereum Sepolia)
-- **Backend**: Node.js, TypeScript, Express, Telegram Bot API
-- **Frontend**: Next.js, React, MetaMask Smart Accounts Kit
-- **Database**: Supabase (PostgreSQL)
-- **Indexing**: Envio HyperSync
-- **DeFi**: Aave Protocol integration
-- **Wallet**: MetaMask with Smart Accounts & Advanced Permissions
+- **Frontend**: Next.js 14 (App Router), TailwindCSS, Wagmi/Viem
+- **Smart Accounts**: MetaMask Smart Accounts Kit (Delegation & Permissions)
+- **Backend/DB**: Supabase (PostgreSQL), Next.js Server Actions
+- **Blockchain**: Ethereum Sepolia Testnet
+- **DeFi**: Aave V3 Protocol
+- **Indexing**: Envio HyperSync (Real-time data) / Hybrid Local Storage Fallback
 
-## Quick Start
+## 🔗 Contract Addresses (Sepolia)
 
-### Prerequisites
+| Contract | Address |
+|----------|---------|
+| **Gift Escrow** | `0x72425B766F61a83da983c1908460DF118FA125Ad` |
+| **Savings Circle** | `0xEf2BF49C0394560384301A209c8793160B3D2ac8` |
+| **USDC Token** | `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238` |
+| **Aave Pool** | `0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951` |
 
-- Node.js 18+ and npm
-- MetaMask wallet
-- Telegram account
-- Supabase account (for database)
-- Fly.io account (for backend hosting)
-- Vercel account (for frontend hosting)
+## 📦 Quick Start
 
-### Installation
+### 1. Prerequisites
+- Node.js 18+ & npm/pnpm
+- Supabase Project
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/joboyebisi/minties.git
-   cd minties
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   cd frontend && npm install
-   cd ../backend && npm install
-   ```
-
-3. **Set up environment variables**:
-   - See `ENV_VARS_GUIDE.md` for complete list
-   - Backend: Create `backend/.env`
-   - Frontend: Create `frontend/.env.local`
-
-4. **Set up Supabase**:
-   - Create Supabase project
-   - Run migrations from `supabase/` directory:
-     - `schema.sql`
-     - `rpc.sql`
-     - `rls_policies.sql`
-   - See `SUPABASE_SETUP.md` for details
-
-5. **Deploy contracts** (optional for local dev):
-   ```bash
-   cd contracts
-   npm install
-   npm run compile
-   npm run deploy:sepolia
-   ```
-
-6. **Start development**:
-   ```bash
-   # Terminal 1: Backend
-   cd backend
-   npm run dev
-
-   # Terminal 2: Frontend
-   cd frontend
-   npm run dev
-   ```
-
-## Deployment
-
-See `QUICK_DEPLOY.md` for step-by-step deployment instructions:
-
-- **Backend**: Deploy to Railway (see `RAILWAY_SETUP.md`)
-- **Frontend**: Deploy to Vercel (see `VERCEL_SETUP.md`)
-- **Telegram**: Configure bot (see `TELEGRAM_SETUP.md`)
-
-## Project Structure
-
-```
-minties/
-├── contracts/          # Smart contracts (GiftEscrow, SavingsCircle)
-├── backend/            # Telegram bot & API server
-│   ├── src/
-│   │   ├── routes/    # API endpoints
-│   │   ├── services/  # Business logic
-│   │   └── telegram/  # Bot handlers
-├── frontend/          # Next.js web app
-│   └── src/
-│       ├── app/       # Next.js pages
-│       ├── components/ # React components
-│       └── lib/       # Utilities & integrations
-├── supabase/          # Database migrations
-└── envio/             # Event indexing config
+### 2. Installation
+```bash
+git clone https://github.com/joboyebisi/minties.git
+cd minties/frontend
+npm install
 ```
 
-## Key Features
+### 3. Environment Variables
+Create `.env.local` in `frontend/`:
+```env
+NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=...
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+NEXT_PUBLIC_BUNDLER_URL=...
+NEXT_PUBLIC_PAYMASTER_URL=...
+```
 
-- ✅ **MetaMask Smart Accounts** - Gasless transactions with account abstraction
-- ✅ **Advanced Permissions** - Recurring payments without repeated approvals
-- ✅ **DeFi Integration** - Earn yield through Aave protocol
-- ✅ **Gamification** - Points, badges, streaks, and leaderboards
-- ✅ **Social Features** - Invite system, sharing, savings circles
-- ✅ **Telegram Native** - Full Mini App integration
+### 4. Database Setup (Supabase)
+Run the SQL migrations in your Supabase SQL Editor:
+1. `frontend/src/migrations/01_profiles.sql` (User Profiles)
+2. `frontend/src/migrations/02_features.sql` (MoneyBox, Circles, Gifts)
 
-## Documentation
+### 5. Run Locally
+```bash
+npm run dev
+# Open http://localhost:3000
+```
 
-- `QUICK_DEPLOY.md` - Quick deployment guide
-- `ENV_VARS_GUIDE.md` - Environment variables reference
-- `SUPABASE_SETUP.md` - Database setup guide
-- `RAILWAY_SETUP.md` - Backend deployment
-- `VERCEL_SETUP.md` - Frontend deployment
-- `TELEGRAM_SETUP.md` - Bot configuration
+## 📱 How to Use (Demo Flow)
+
+1. **Connect Wallet**: Use MetaMask (supports Smart Account creation).
+2. **Create Profile**: Set a display name.
+3. **Create MoneyBox**: 
+   - Go to "New Goal", enter amount & timeline.
+   - Enable "Yield" to deposit into Aave.
+4. **Send Gift**:
+   - Go to "Send Gift", enter amount.
+   - Copy the generated link and open it in a new tab to Claim.
+5. **Create Circle**:
+   - Go to "New Circle", set target.
+   - Invite friends to join your circle ID.
+
+## ⚠️ Notes
+- **Persistence**: The app uses a hybrid strategy. It tries to fetch from Supabase first, but falls back to **Local Storage** if the database is unreachable or for guest users.
+- **HyperSync**: Historical data indexing is configured via Envio. Ensure `@hypersync/client` is installed if you need full historical transaction replay.
 
 ## License
-
 MIT
-
-## Support
-
-For issues and questions, please open an issue on GitHub.

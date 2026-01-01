@@ -56,11 +56,16 @@ export default function CreateSavingsCirclePage() {
             }
 
             // 2. Create Circle On-Chain
+            // Dynamically import to avoid server-side issues with 'viem' if any
             const { createCircle } = await import("@/lib/transactions");
-            const { keccak256, toBytes, concat } = await import("viem");
-            const timestamp = Date.now().toString();
-            const idBytes = concat([toBytes(address), toBytes(timestamp)]);
-            const id = keccak256(idBytes) as `0x${string}`;
+            const { keccak256, encodePacked } = await import("viem");
+
+            // Generate deterministic ID: hash(creator + timestamp)
+            const timestamp = BigInt(Date.now());
+            const idBytes = encodePacked(['address', 'uint256'], [address, timestamp]);
+            const id = keccak256(idBytes);
+
+            console.log("Creating Circle ID:", id);
 
             const lockSeconds = parseInt(formData.lockPeriod) * 7 * 24 * 60 * 60;
             const yieldBps = parseFloat(formData.yieldPercentage) * 100;
@@ -74,6 +79,15 @@ export default function CreateSavingsCirclePage() {
             });
 
             setCircleId(id);
+
+            // Save to local storage for dashboard
+            const { saveItem } = await import("@/lib/local-db");
+            saveItem("circles", {
+                id: id,
+                name: `Circle ${formData.targetAmount} USDC`, // Name it by amount for now or add a name field
+                target: formData.targetAmount
+            });
+
             show("success", "Circle created successfully!");
             setCurrentStep(3); // Success step
 

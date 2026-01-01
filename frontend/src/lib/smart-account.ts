@@ -7,9 +7,9 @@
 import {
     Implementation,
     toMetaMaskSmartAccount,
+    Delegation,
     SmartAccountsEnvironment,
     getSmartAccountsEnvironment,
-    // deploySmartAccountsEnvironment // Removed as not found
 } from "@metamask/smart-accounts-kit";
 import { createWalletClient, createPublicClient, http, custom, Address } from "viem";
 import { sepolia } from "viem/chains";
@@ -95,4 +95,87 @@ export async function setupSmartAccount(type: SmartAccountType = 'hybrid') {
         type,
         userAddress: owner
     };
+}
+
+// Delegation Utils
+import { createOpenDelegation, createExecution, ExecutionMode } from '@metamask/smart-accounts-kit';
+import { DelegationManager } from '@metamask/smart-accounts-kit/contracts';
+
+export async function createInviteDelegation(smartAccount: any, amountWei: bigint) {
+    if (!smartAccount) throw new Error("Smart Account not initialized");
+
+    const delegation = createOpenDelegation({
+        from: smartAccount.address,
+        environment: smartAccount.environment,
+        scope: {
+            type: 'nativeTokenTransferAmount',
+            maxAmount: amountWei,
+        },
+    });
+
+    const signature = await smartAccount.signDelegation({ delegation });
+
+    return {
+        ...delegation,
+        signature
+    };
+}
+
+export function encodeDelegation(delegation: Delegation): string {
+    const delegationJson = JSON.stringify(delegation);
+    if (typeof window !== 'undefined') {
+        return window.btoa(delegationJson);
+    }
+    return Buffer.from(delegationJson, 'utf-8').toString('base64');
+}
+
+export function decodeDelegation(encodedString: string): Delegation {
+    let decodedJson;
+    if (typeof window !== 'undefined') {
+        decodedJson = window.atob(encodedString);
+    } else {
+        decodedJson = Buffer.from(encodedString, 'base64').toString('utf-8');
+    }
+    return JSON.parse(decodedJson) as Delegation;
+}
+
+export async function redeemInviteDelegation(
+    smartAccount: any,
+    delegation: Delegation,
+    bundlerClient: any,
+    amountWei: bigint
+) {
+    // 1. Create Execution
+    const executions = createExecution({
+        target: smartAccount.address,
+        value: amountWei,
+        callData: "0x"
+    });
+
+    // 2. Encode Redeem Call
+    // delegations expects Delegation[][], modes expects ExecutionMode[][]
+    // If the error persists, check if modes expects a single ExecutionMode per batch?
+    const redeemDelegationCalldata = DelegationManager.encode.redeemDelegations({
+        delegations: [[delegation]],
+        modes: [ExecutionMode.SingleDefault],
+        executions: [[executions]]
+    });
+
+    // 3. Send UserOp
+    const maxFeePerGas = 1n;
+    const maxPriorityFeePerGas = 1n;
+
+    const userOpHash = await bundlerClient.sendUserOperation({
+        account: smartAccount,
+        calls: [
+            {
+                to: smartAccount.address,
+                data: redeemDelegationCalldata,
+            },
+        ],
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+    });
+
+    return userOpHash;
 }

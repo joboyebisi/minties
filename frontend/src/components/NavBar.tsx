@@ -5,19 +5,17 @@ import Image from "next/image";
 import { Wallet, Gift, PiggyBank, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const TELEGRAM_BOT_USERNAME = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "Minties_X_Bot";
-
 export function NavBar() {
-  // Use direct bot link if provided, otherwise construct from username
-  const telegramUrl = process.env.NEXT_PUBLIC_TELEGRAM_BOT_URL || `https://t.me/${TELEGRAM_BOT_USERNAME}`;
-  
+  // Hardcoded to ensure correct redirection as per user request
+  const telegramUrl = "https://t.me/Minties_X_Bot";
+
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768); // 768px is typical tablet breakpoint
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -84,4 +82,3 @@ export function NavBar() {
     </header>
   );
 }
-

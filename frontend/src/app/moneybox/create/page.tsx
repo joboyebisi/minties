@@ -63,7 +63,21 @@ function CreateMoneyBoxForm() {
 
         setLoading(true);
         try {
-            // 1. If auto-save enabled, request permission
+            // 1. If Yield Enabled, Deposit Initial Amount to Aave
+            if (formData.enableYield && amount > 0) {
+                // In a real flow, you might ask for an *initial* deposit separate from monthly. 
+                // Assuming the user wants to deposit the first month's contribution now:
+                const initialDeposit = monthlyContribution;
+                // Or we could have an "Initial Deposit" field. For simplicity, we assume 1st month.
+
+                await supplyUsdc({
+                    walletClient: walletClient,
+                    amount: initialDeposit,
+                });
+                show("success", `Deposited ${initialDeposit.toFixed(2)} USDC to Aave!`);
+            }
+
+            // 2. If auto-save enabled, request permission
             if (formData.autoSave) {
                 const client = createWalletClientWithPermissions();
                 // Request recurring transfer permission
@@ -76,12 +90,39 @@ function CreateMoneyBoxForm() {
                 show("success", "Recurring saving permission granted!");
             }
 
-            // 2. Create MoneyBox (Save to database/contract)
-            // For now we'll simulate this and redirect
-            // In real app: await createMoneyBox({...})
+            // 3. Create MoneyBox (Save to database/contract)
+            // Ideally we save the "AaveEnabled" flag so dashboard knows to check aToken balance
+            console.log("Creating MoneyBox:", { ...formData, owner: address });
+
+            const newBox = {
+                id: Date.now().toString(),
+                owner: address,
+                title: formData.title,
+                target_amount: parseFloat(formData.targetAmount),
+                progress: formData.enableYield && amount > 0 ? (amount / parseFloat(formData.targetAmount) * 100) : 0,
+            };
+
+            // 1. Save to Supabase (Primary)
+            try {
+                const { saveMoneyBox } = await import("@/lib/supabase");
+                await saveMoneyBox(newBox);
+            } catch (e) {
+                console.error("Supabase Save Failed", e);
+            }
+
+            // 2. Save Locally (Secondary/Cache)
+            try {
+                const { saveItem } = await import("@/lib/local-db");
+                saveItem("moneyBoxes", {
+                    id: newBox.id,
+                    title: newBox.title,
+                    target: newBox.target_amount,
+                    progress: newBox.progress
+                });
+            } catch (e) { console.error(e); }
 
             show("success", "Money Box created successfully!");
-            // router.push(`/moneybox/success?id=new`); // or dashboard
+            router.push(`/`);
 
         } catch (error: any) {
             console.error("Creation failed", error);
