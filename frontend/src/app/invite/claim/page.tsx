@@ -7,7 +7,9 @@ import { useToast } from "@/components/ToastProvider";
 import { Sparkles, Loader2, CheckCircle, ArrowRight } from "lucide-react";
 import { parseEther } from "viem";
 
-export default function ClaimInvitePage() {
+import { Suspense } from "react";
+
+function ClaimInviteContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { show } = useToast();
@@ -25,22 +27,16 @@ export default function ClaimInvitePage() {
 
         try {
             // 1. Setup New User Smart Account (Stateless or Hybrid)
-            // Ideally invitee doesn't even need funds, so we use the Delegation to pay gas.
-            // NOTE: For true gasless onboarding, we rely on the Bundler Paymaster + Delegation.
             const { smartAccount, bundlerClient } = await setupSmartAccount('hybrid');
 
             setMessage("Verifying invitation...");
             const delegation = decodeDelegation(delegationParam);
 
-            // 2. Redeem Delegation (Execute a tx to 'activate' account or just use funds)
-            // Here we redeem it to "claim" the gas/funds usage.
+            // 2. Redeem Delegation
             setMessage("Redeeming invitation funds...");
-
-            // Hardcoded amount matches what was delegated (or less)
-            const amountWei = parseEther("0.0005"); // Spending a bit to prove it works
+            const amountWei = parseEther("0.0005");
 
             const userOp = await redeemInviteDelegation(smartAccount, delegation, bundlerClient, amountWei);
-
             console.log("Redemption UserOp:", userOp);
 
             setStatus('success');
@@ -117,5 +113,13 @@ export default function ClaimInvitePage() {
                 )}
             </div>
         </main>
+    );
+}
+
+export default function ClaimInvitePage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen text-[#30f0a8] flex items-center justify-center">Loading...</div>}>
+            <ClaimInviteContent />
+        </Suspense>
     );
 }
