@@ -14,16 +14,32 @@ export const USDC_ADDRESS: Address = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
 
 // Create wallet client extended with permissions actions
 export function createWalletClientWithPermissions() {
-  if (typeof window === 'undefined' || !window.ethereum) {
-    throw new Error('MetaMask not detected');
+  if (typeof window === 'undefined') return null;
+
+  // Check for Ethereum provider
+  const provider = window.ethereum;
+  if (!provider) {
+    throw new Error('No wallet detected. Please install MetaMask.');
   }
 
-  const client = createWalletClient({
-    chain: sepolia,
-    transport: custom(window.ethereum),
-  }).extend(erc7715ProviderActions());
+  // Debug log for conflicts (Polkadot.js vs MetaMask)
+  console.log("Creating WalletClient. Provider:", {
+    isMetaMask: provider.isMetaMask,
+    isPhantom: (provider as any).isPhantom,
+    isBraveWallet: (provider as any).isBraveWallet
+  });
 
-  return client;
+  try {
+    const client = createWalletClient({
+      chain: sepolia,
+      transport: custom(provider),
+    }).extend(erc7715ProviderActions());
+
+    return client;
+  } catch (error) {
+    console.error("Failed to create permissions client", error);
+    throw new Error("Failed to initialize wallet client. If you have multiple wallets (Polkadot.js, Phantom), please disable them and retry.");
+  }
 }
 
 // Request ERC-20 periodic transfer permission (for recurring payments)
@@ -36,7 +52,7 @@ export async function requestRecurringTransferPermission({
   expiry,
   justification,
 }: {
-  walletClient: ReturnType<typeof createWalletClientWithPermissions>;
+  walletClient: ReturnType<typeof createWalletClientWithPermissions> | null;
   sessionAccountAddress: Address;
   tokenAddress?: Address;
   periodAmount: string; // Human readable amount (e.g. "10")
@@ -44,6 +60,10 @@ export async function requestRecurringTransferPermission({
   expiry: number; // Timestamp seconds
   justification?: string;
 }) {
+  if (!walletClient) {
+    throw new Error("Wallet client not initialized");
+  }
+
   const chainId = sepolia.id;
   // USDC has 6 decimals
   const amountWei = parseUnits(periodAmount, 6);

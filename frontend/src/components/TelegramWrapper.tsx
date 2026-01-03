@@ -15,8 +15,15 @@ export function TelegramWrapper({ children }: TelegramWrapperProps) {
       // Set theme colors
       const bgColor = themeParams.bg_color || (theme === "dark" ? "#000000" : "#ffffff");
       const textColor = themeParams.text_color || (theme === "dark" ? "#ffffff" : "#000000");
-      
-      tg.setBackgroundColor(bgColor);
+
+      try {
+        if (parseFloat(tg.version) >= 6.1) {
+          tg.setBackgroundColor(bgColor);
+        }
+      } catch (e) {
+        // Ignore style errors for older versions
+        console.warn("Telegram BG color error", e);
+      }
       document.body.style.backgroundColor = bgColor;
       document.body.style.color = textColor;
 
