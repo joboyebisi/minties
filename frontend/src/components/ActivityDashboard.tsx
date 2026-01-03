@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { getWalletHistory } from "@/lib/hypersync";
+import { getWalletHistoryAction } from "@/app/actions/hypersync-actions";
 import { ArrowUpRight, ArrowDownLeft, Clock, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
@@ -26,8 +26,8 @@ export function ActivityDashboard() {
         const load = async () => {
             setLoading(true);
             try {
-                // Fetch from Envio HyperSync
-                const history = await getWalletHistory(address);
+                // Fetch from Envio HyperSync (via Server Action)
+                const history = await getWalletHistoryAction(address);
                 // Map to match interface if needed, Envio returns 'block_number' etc.
                 const mapped = (history || []).map((tx: any) => ({
                     ...tx,
