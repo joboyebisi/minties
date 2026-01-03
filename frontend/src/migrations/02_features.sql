@@ -32,8 +32,21 @@ CREATE TABLE IF NOT EXISTS gifts (
 ALTER TABLE money_boxes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE savings_circles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gifts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
 
--- Allow public read/write for demo (restricted by app logic)
+-- Drop existing policies to allow re-runs
+DROP POLICY IF EXISTS "Public read money_boxes" ON money_boxes;
+DROP POLICY IF EXISTS "Public insert money_boxes" ON money_boxes;
+DROP POLICY IF EXISTS "Public read savings_circles" ON savings_circles;
+DROP POLICY IF EXISTS "Public insert savings_circles" ON savings_circles;
+DROP POLICY IF EXISTS "Public read gifts" ON gifts;
+DROP POLICY IF EXISTS "Public insert gifts" ON gifts;
+DROP POLICY IF EXISTS "Public update gifts" ON gifts;
+DROP POLICY IF EXISTS "Public read contacts" ON contacts;
+DROP POLICY IF EXISTS "Public insert contacts" ON contacts;
+DROP POLICY IF EXISTS "Public update contacts" ON contacts;
+
+-- Create policies
 CREATE POLICY "Public read money_boxes" ON money_boxes FOR SELECT USING (true);
 CREATE POLICY "Public insert money_boxes" ON money_boxes FOR INSERT WITH CHECK (true);
 
@@ -44,17 +57,6 @@ CREATE POLICY "Public read gifts" ON gifts FOR SELECT USING (true);
 CREATE POLICY "Public insert gifts" ON gifts FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public update gifts" ON gifts FOR UPDATE USING (true);
 
--- Contacts (Synced from Telegram)
-CREATE TABLE IF NOT EXISTS contacts (
-    telegram_user_id BIGINT PRIMARY KEY,
-    phone_number TEXT NOT NULL,
-    first_name TEXT,
-    last_name TEXT,
-    wallet_address TEXT, -- Optional linkage
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
-ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read contacts" ON contacts FOR SELECT USING (true);
 CREATE POLICY "Public insert contacts" ON contacts FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public update contacts" ON contacts FOR UPDATE USING (true);

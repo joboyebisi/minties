@@ -61,3 +61,10 @@ backend/.env
 
 # Supabase
 .supabase/
+
+# Documentation Clutter
+*_GUIDE.md
+*_SETUP.md
+*_CHECKLIST.md
+HOW_TO_*.md
+QUICK_*.md
