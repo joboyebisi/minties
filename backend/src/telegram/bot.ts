@@ -244,6 +244,7 @@ Need help? Contact support: @mintiessupport
     });
   } catch (error) {
     console.warn("Failed to set menu button:", error);
+    console.warn("DEBUG: Ensure FRONTEND_URL matches your Vercel URL (HTTPS). Current:", frontendUrl);
   }
 
   // Handle Contact Sharing (Legacy/Direct)

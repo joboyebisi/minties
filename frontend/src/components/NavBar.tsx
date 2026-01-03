@@ -67,16 +67,14 @@ export function NavBar() {
             <Wallet size={16} className="text-[#30f0a8]" />
             {!isMobile && <span>Wallet</span>}
           </Link>
-          <a
-            href={telegramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/telegram"
             className="inline-flex items-center gap-1 px-2 md:px-3 py-2 rounded-full hover:bg-[rgba(48,240,168,0.08)] transition border border-[rgba(48,240,168,0.2)]"
             title={isMobile ? "Telegram" : undefined}
           >
             <MessageCircle size={16} className="text-[#30f0a8]" />
             {!isMobile && <span>Telegram</span>}
-          </a>
+          </Link>
         </nav>
       </div>
     </header>

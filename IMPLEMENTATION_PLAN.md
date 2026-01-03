@@ -1,68 +1,41 @@
-# Telegram Mini App Improvements Plan
+# Telegram UI Refactor & Bot Debug Plan
 
 ## Goal
-Enable native Telegram Mini App features including contacts request, sharing, home screen shortcuts, and haptic feedback by upgrading the integration to support Bot API 8.0+.
-
-## User Review Required
-- **Testing**: These features rely on the Telegram Native environment. Verification will require deploying to a test URL or running via a tunnel (ngrok) inside Telegram, or using the Telegram Mock/Debug tools.
+Move Telegram features from the Dashboard to a dedicated view accessible via a new Navigation Icon using the Telegram Logo. Debug the missing "Open Mini App" bot button.
 
 ## Proposed Changes
 
-### Frontend Types
-#### [MODIFY] [telegram-web-app.d.ts](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/types/telegram-web-app.d.ts)
-- Add missing Bot API 8.0+ definitions:
-  - `shareMessage`, `shareToStory`
-  - `addToHomeScreen`, `checkHomeScreenStatus`
-  - `requestContact` (ensure correct signature)
-  - `HapticFeedback` (verify completeness)
-  - `LocationManager`, `Accelerometer`, etc. (if relevant)
-
-### Frontend Logic
-#### [MODIFY] [useTelegram.ts](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/hooks/useTelegram.ts)
-- Expose new methods:
-  - `requestContact()`
-  - `shareToStory(mediaUrl, params)`
-  - `shareMessage(msg_id)`
-  - `addToHomeScreen()`
-  - `checkHomeScreenStatus()`
-- Expose new state:
-  - `isFullscreen`, `isActive`
-  - `safeAreaInset`
-
 ### Frontend UI
-#### [NEW] [TelegramFeatures.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/TelegramFeatures.tsx) (Optional Demo Component)
-- A component to demonstrate/test these features:
-  - "Share to Story" button
-  - "Add to Home Screen" button
-  - "Share Contact" button
+#### [MODIFY] [NavBar.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/NavBar.tsx)
+- Change the existing Telegram link (currently `t.me/Minties_X_Bot`) to a local route `/telegram`.
+- Update the icon/label if needed (already has `MessageCircle`).
+
+#### [NEW] [page.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/app/telegram/page.tsx)
+- Create a new page at `/telegram`.
+- Move `TelegramFeatures` component usage here from `UserDashboard`.
+- Add "Connection Status" section.
+- **New**: Add "Saved Contacts" list (fetching from Supabase `contacts` table).
+
+#### [NEW] [ContactsList.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/ContactsList.tsx)
+- Component to display synced Telegram contacts.
+- Fetch from `contacts` table using `supabase-js`.
 
 #### [MODIFY] [UserDashboard.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/UserDashboard.tsx)
-- Integrate helpful shortcuts where relevant (e.g. sharing invite link via native share).
+- Remove `TelegramFeatures` from the dashboard to declutter it.
 
 ### Backend Bot Logic
 #### [MODIFY] [bot.ts](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/backend/src/telegram/bot.ts)
-- **Menu Button**: Ensure `setChatMenuButton` is configured to launch the Web App.
-- **Inline Mode**: Implement `bot.on("inline_query")` to allow users to search/share "Moneybox" or "Gift" links directly from the message bar.
-- **Bot Buttons**: 
-  - Update `/start` and generic keyboards to include specific "💰 My Moneybox" and "🎁 Send Gift" buttons.
-  - Use rich emojis/icons for all buttons.
-
-### Frontend UI
-#### [NEW] [TelegramFeatures.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/TelegramFeatures.tsx) (Demo Component)
-- "Share to Story", "Add to Home Screen", "Share Contact" buttons.
-
-#### [MODIFY] [UserDashboard.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/UserDashboard.tsx)
-- Integrate helpful shortcuts where relevant (e.g. sharing invite link via native share).
+- Add logging to the `setChatMenuButton` catch block.
+- **Hypothesis**: The button fails because `FRONTEND_URL` is localhost. Telegram requires HTTPS.
+- **Fix**: Ensure the user knows to use a persistent public URL (e.g. Vercel) for the bot environment variable.
 
 ## Verification Plan
 
 ### Manual Verification
-1.  **Mock Environment**: Use the [Telegram Web App emulator](https://web.telegram.org/) or browser console to mock `window.Telegram.WebApp` methods.
-2.  **Deployment**: Deploy to Vercel.
-3.  **Real Device**:
-    - **Sharing**: Click "Share to Story" -> System sheet should open.
-    - **Shortcuts**: Click "Add to Home Screen" -> Prompt should appear.
-    - **Birthdays**: Add a birthday manually. Verify it saves to Supabase.
-4.  **Bot Interaction**:
-    - Type `@BotName` in chat -> Show "My Moneybox".
-    - Check Menu Button -> "Open App".
+1.  **Nav**: Click Telegram icon in Navbar -> Should go to `/telegram`.
+2.  **Page**: `/telegram` should show:
+    - Connection Status (e.g. "Connected as @User").
+    - Feature buttons (Share, Home Screen, etc.).
+3.  **Bot Button**:
+    - Check server logs after restart to see if `setChatMenuButton` threw an error.
+    - User to verify on real device with Vercel URL.
