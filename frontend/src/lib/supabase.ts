@@ -154,6 +154,51 @@ export async function saveGift(gift: any) {
 
 export async function getUserGifts(address: string) {
   if (!supabase) return [];
-  const { data } = await supabase.from('gifts').select('*').eq('sender', address);
+  const { data } = await supabase.from('gifts').select('*').eq('sender_id', address); // Using sender_id based on schema likely, or just 'sender' if loose. Schema in 1463 says 'sender_id'.
   return data || [];
+}
+
+// --- Notifications ---
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  type: 'deposit' | 'yield' | 'gift_sent' | 'gift_claimed' | 'circle_invite' | 'system';
+  message: string;
+  read: boolean;
+  created_at: string;
+}
+
+export async function createNotification(notification: Omit<Notification, 'id' | 'created_at' | 'read'>) {
+  if (!supabase) return null;
+  const { error } = await supabase.from('notifications').insert(notification);
+  if (error) console.error("Error creating notification:", error);
+  return !error;
+}
+
+export async function getNotifications(userId: string) {
+  if (!supabase) return [];
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+    return data as Notification[];
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return [];
+  }
+}
+
+export async function markNotificationRead(id: string) {
+  if (!supabase) return null;
+  const { error } = await supabase
+    .from('notifications')
+    .update({ read: true })
+    .eq('id', id);
+  return !error;
 }

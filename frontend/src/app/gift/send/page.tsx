@@ -8,6 +8,7 @@ import { useToast } from "@/components/ToastProvider";
 import { PermissionGuard } from "@/components/PermissionGuard";
 import { createWalletClientWithPermissions, setupRecurringGift } from "@/lib/metamask-permissions";
 import { createGift } from "@/lib/transactions";
+import { createNotification } from "@/lib/supabase";
 import { QRCodeSVG } from "qrcode.react";
 
 export default function SendGiftPage() {
@@ -81,6 +82,14 @@ export default function SendGiftPage() {
             });
 
             setStep("success");
+
+            // Notify
+            await createNotification({
+                user_id: address,
+                type: 'gift_sent',
+                message: `Sent a gift of ${formData.amount} USDC${formData.recipient ? ` to ${formData.recipient}` : ''}`,
+            });
+
             show("success", "Gift created! Share the link.");
 
         } catch (error: any) {

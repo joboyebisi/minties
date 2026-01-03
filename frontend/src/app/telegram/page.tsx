@@ -15,6 +15,18 @@ export default function TelegramPage() {
             <div>
                 <h1 className="text-2xl font-bold text-[#e8fdf4] mb-1">Telegram Integration</h1>
                 <p className="text-sm text-[#8da196]">Manage your connected experience.</p>
+
+                <a
+                    href="https://t.me/Minties_X_Bot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-[#24A1DE] hover:bg-[#208bbf] text-white font-semibold transition shadow-lg shadow-[#24A1DE]/20"
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="fill-current">
+                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 11.944 0zm5.849 8.16l-1.994 9.4c-.15.68-.698.85-1.41.53l-3.904-2.88-1.886 1.815c-.207.208-.382.383-.783.383l.28-3.974 7.237-6.538c.314-.28-.068-.435-.487-.156l-8.94 5.626-3.854-1.205c-.838-.262-.852-.835.174-1.237l15.048-5.795c.698-.253 1.309.155 1.519 1.031z" />
+                    </svg>
+                    Open Bot
+                </a>
             </div>
 
             {/* Connection Status */}

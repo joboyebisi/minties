@@ -1,41 +1,30 @@
-# Telegram UI Refactor & Bot Debug Plan
+# Activity Dashboard & Envio Integration Plan
 
 ## Goal
-Move Telegram features from the Dashboard to a dedicated view accessible via a new Navigation Icon using the Telegram Logo. Debug the missing "Open Mini App" bot button.
+Implement a UI to display transaction history (deposits, gifts, circle contributions) using the existing Envio HyperSync client (`src/lib/hypersync.ts`).
 
 ## Proposed Changes
 
-### Frontend UI
-#### [MODIFY] [NavBar.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/NavBar.tsx)
-- Change the existing Telegram link (currently `t.me/Minties_X_Bot`) to a local route `/telegram`.
-- Update the icon/label if needed (already has `MessageCircle`).
-
-#### [NEW] [page.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/app/telegram/page.tsx)
-- Create a new page at `/telegram`.
-- Move `TelegramFeatures` component usage here from `UserDashboard`.
-- Add "Connection Status" section.
-- **New**: Add "Saved Contacts" list (fetching from Supabase `contacts` table).
-
-#### [NEW] [ContactsList.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/ContactsList.tsx)
-- Component to display synced Telegram contacts.
-- Fetch from `contacts` table using `supabase-js`.
+#### [NEW] [ActivityDashboard.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/ActivityDashboard.tsx)
+- Create a reusable component `ActivityDashboard`.
+- Use `getWalletHistory(address)` from `@/lib/hypersync`.
+- Display a list of transactions with:
+    - Type (Sent/Received)
+    - Amount (formatted)
+    - Date (timestamp)
+    - Hash (link to explorer)
 
 #### [MODIFY] [UserDashboard.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/UserDashboard.tsx)
-- Remove `TelegramFeatures` from the dashboard to declutter it.
+- Integrate `ActivityDashboard` component at the bottom of the main dashboard.
 
-### Backend Bot Logic
-#### [MODIFY] [bot.ts](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/backend/src/telegram/bot.ts)
-- Add logging to the `setChatMenuButton` catch block.
-- **Hypothesis**: The button fails because `FRONTEND_URL` is localhost. Telegram requires HTTPS.
-- **Fix**: Ensure the user knows to use a persistent public URL (e.g. Vercel) for the bot environment variable.
+#### [MODIFY] [hypersync.ts](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/lib/hypersync.ts)
+- Ensure `getWalletHistory` handles edge cases (empty results, errors).
 
 ## Verification Plan
-
-### Manual Verification
-1.  **Nav**: Click Telegram icon in Navbar -> Should go to `/telegram`.
-2.  **Page**: `/telegram` should show:
-    - Connection Status (e.g. "Connected as @User").
-    - Feature buttons (Share, Home Screen, etc.).
-3.  **Bot Button**:
-    - Check server logs after restart to see if `setChatMenuButton` threw an error.
-    - User to verify on real device with Vercel URL.
+1.  **Manual Verification**:
+    - Open Dashboard.
+    - Check if "Recent Activity" section appears.
+    - Perform a transaction (or use existing history).
+    - Verify data appears in the list.
+2.  **Envio Interaction**:
+    - The `hypersync.ts` client is pre-configured with a public URL. No user setup required for basic read-only history.

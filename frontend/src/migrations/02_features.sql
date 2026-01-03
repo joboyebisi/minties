@@ -28,6 +28,16 @@ CREATE TABLE IF NOT EXISTS gifts (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- Contacts (Synced from Telegram)
+CREATE TABLE IF NOT EXISTS contacts (
+    telegram_user_id BIGINT PRIMARY KEY,
+    phone_number TEXT NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    wallet_address TEXT, -- Optional linkage
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- RLS Policies
 ALTER TABLE money_boxes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE savings_circles ENABLE ROW LEVEL SECURITY;
@@ -45,18 +55,6 @@ DROP POLICY IF EXISTS "Public update gifts" ON gifts;
 DROP POLICY IF EXISTS "Public read contacts" ON contacts;
 DROP POLICY IF EXISTS "Public insert contacts" ON contacts;
 DROP POLICY IF EXISTS "Public update contacts" ON contacts;
-
--- Contacts (Synced from Telegram)
-CREATE TABLE IF NOT EXISTS contacts (
-    telegram_user_id BIGINT PRIMARY KEY,
-    phone_number TEXT NOT NULL,
-    first_name TEXT,
-    last_name TEXT,
-    wallet_address TEXT, -- Optional linkage
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
-ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
 CREATE POLICY "Public read money_boxes" ON money_boxes FOR SELECT USING (true);

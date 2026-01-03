@@ -31,7 +31,14 @@ const useUserItems = (address?: string) => {
                 // Determine address to fetch for (requires importing helper)
                 // We'll dynamic import to avoid issues if helpers aren't perfectly typed yet
                 const { getUserMoneyBoxes, getCircles, getUserGifts } = await import("@/lib/supabase");
-                const { address: currentAddress } = await import("@/lib/smart-account").then(() => ({ address: "TODO_fix_scope" })); // Hacky, better to use the hook's address in scope
+                // const { address: currentAddress } = await import("@/lib/smart-account"); // Removed problematic line
+
+                if (address) {
+                    const boxes = await getUserMoneyBoxes(address);
+                    // const circles = await getCircles(); // Removed unused
+                    const gifts = await getUserGifts(address);
+                    setItems(prev => ({ ...prev, moneyBoxes: boxes as any, gifts: gifts as any }));
+                }
 
                 // We can't easily access 'address' from hook here inside useEffect if not passed to helper
                 // But we can use the 'items' state setter.
@@ -120,7 +127,7 @@ export function UserDashboard() {
                 <QuickAction icon={<Target size={20} />} label="New Goal" href="/moneybox/create" color="text-[#30f0a8]" />
                 <QuickAction icon={<Gift size={20} />} label="Send Gift" href="/gift/send" color="text-[#30f0a8]" />
                 <QuickAction icon={<PiggyBank size={20} />} label="New Circle" href="/circle/create" color="text-[#30f0a8]" />
-                <QuickAction icon={<Clock size={20} />} label="Activity" href="/" color="text-[#8da196]" />
+                <QuickAction icon={<Clock size={20} />} label="Activity" href="/activity" color="text-[#8da196]" />
             </div>
 
             {/* My MoneyBoxes */}

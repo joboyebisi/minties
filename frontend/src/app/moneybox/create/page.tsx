@@ -8,6 +8,7 @@ import { useToast } from "@/components/ToastProvider";
 import { PermissionGuard } from "@/components/PermissionGuard";
 import { createWalletClientWithPermissions, setupMoneyBoxRecurringTransfer } from "@/lib/metamask-permissions";
 import { fetchAaveApy, supplyUsdc } from "@/lib/aave";
+import { createNotification } from "@/lib/supabase";
 
 export default function CreateMoneyBoxPage() {
     return (
@@ -106,6 +107,13 @@ function CreateMoneyBoxForm() {
             try {
                 const { saveMoneyBox } = await import("@/lib/supabase");
                 await saveMoneyBox(newBox);
+
+                // Notify
+                await createNotification({
+                    user_id: address,
+                    type: 'deposit',
+                    message: `Created Money Box "${newBox.title}" with target ${newBox.target_amount} USDC`,
+                });
             } catch (e) {
                 console.error("Supabase Save Failed", e);
             }

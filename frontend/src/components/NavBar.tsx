@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Wallet, Gift, PiggyBank, MessageCircle } from "lucide-react";
+import { NotificationsPanel } from "./NotificationsPanel";
 import { useEffect, useState } from "react";
 
 export function NavBar() {
@@ -41,6 +42,7 @@ export function NavBar() {
               </div>
             )}
           </Link>
+          <NotificationsPanel />
         </div>
         <nav className="flex items-center gap-2 md:gap-3 text-sm text-[#bfe8d7]">
           <Link

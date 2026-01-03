@@ -70,8 +70,9 @@ NEXT_PUBLIC_PAYMASTER_URL=...
 
 ### 4. Database Setup (Supabase)
 Run the SQL migrations in your Supabase SQL Editor:
-1. `frontend/src/migrations/01_profiles.sql` (User Profiles)
-2. `frontend/src/migrations/02_features.sql` (MoneyBox, Circles, Gifts)
+1. `src/migrations/01_profiles.sql` (User Profiles)
+2. `src/migrations/02_features.sql` (MoneyBox, Circles, Gifts, Contacts)
+3. `src/migrations/03_notifications.sql` (Notifications System)
 
 ### 5. Run Locally
 ```bash
@@ -83,19 +84,20 @@ npm run dev
 
 1. **Connect Wallet**: Use MetaMask (supports Smart Account creation).
 2. **Create Profile**: Set a display name.
-3. **Create MoneyBox**: 
+3. **Telegram Integration**: Click the Telegram icon to sync contacts and open the bot.
+4. **Create MoneyBox**: 
    - Go to "New Goal", enter amount & timeline.
    - Enable "Yield" to deposit into Aave.
-4. **Send Gift**:
+5. **Send Gift**:
    - Go to "Send Gift", enter amount.
-   - Copy the generated link and open it in a new tab to Claim.
-5. **Create Circle**:
+   - Copy the generated link to share.
+6. **Create Circle**:
    - Go to "New Circle", set target.
-   - Invite friends to join your circle ID.
+   - Invite friends using your circle ID.
 
 ## ⚠️ Notes
-- **Persistence**: The app uses a hybrid strategy. It tries to fetch from Supabase first, but falls back to **Local Storage** if the database is unreachable or for guest users.
-- **HyperSync**: Historical data indexing is configured via Envio. Ensure `@hypersync/client` is installed if you need full historical transaction replay.
+- **Persistence**: The app uses a hybrid strategy (Supabase + Local Storage).
+- **Envio**: Historical data indexing is supported via HyperSync.
 
 ## License
 MIT
