@@ -30,6 +30,25 @@ Social saving with friends.
 - **Yield Generating**: Circle funds earn DeFi yield while locked.
 - **Transparent**: View all participants and contributions.
 
+## 🔐 Advanced Permissions Usage (ERC-7715)
+This project utilizes **MetaMask Advanced Permissions** (ERC-7715) via the Smart Accounts Kit to enable fine-grained, recurring allowances for auto-savings and subscriptions.
+
+- **Requesting Permissions**:
+  - Library Definition: [`frontend/src/lib/metamask-permissions.ts`](frontend/src/lib/metamask-permissions.ts) (`requestRecurringTransferPermission`)
+  - Usage (MoneyBox): [`frontend/src/app/moneybox/create/page.tsx`](frontend/src/app/moneybox/create/page.tsx) (`setupMoneyBoxRecurringTransfer`)
+  - Usage (Recurring Gifts): [`frontend/src/app/gift/send/page.tsx`](frontend/src/app/gift/send/page.tsx) (`setupRecurringGift`)
+  
+- **Redeeming Permissions**:
+  - Library Definition: [`frontend/src/lib/metamask-permissions.ts`](frontend/src/lib/metamask-permissions.ts) (`redeemPermissionAndTransfer`)
+  - Usage (Demo Trigger): [`frontend/src/app/moneybox/[id]/page.tsx`](frontend/src/app/moneybox/[id]/page.tsx)
+
+## ⚡ Envio Usage
+We use **Envio HyperSync** to index Smart Account activity (deposits, gifts, claims) in real-time, allowing the UI to bypass slow standard RPC calls for transaction history.
+
+- **Server Action**: [`frontend/src/app/actions/hypersync-actions.ts`](frontend/src/app/actions/hypersync-actions.ts) (`getWalletHistoryAction`)
+- **UI Integration**: [`frontend/src/components/ActivityDashboard.tsx`](frontend/src/components/ActivityDashboard.tsx)
+- **Data Flow**: The dashboard fetches directly from HyperSync via a Next.js Server Action to display deposits and gift history instantly.
+
 ## 🛠 Tech Stack
 
 - **Frontend**: Next.js 14 (App Router), TailwindCSS, Wagmi/Viem
