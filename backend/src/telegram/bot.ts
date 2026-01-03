@@ -9,7 +9,7 @@ export function setupTelegramBot(bot: TelegramBot) {
   // Start command
   bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const frontendUrl = process.env.FRONTEND_URL || "https://minties.vercel.app";
 
     // Send welcome message with Rich Menu
     await bot.sendMessage(chatId, "🎁 *Welcome to Minties!*", {
@@ -44,7 +44,7 @@ export function setupTelegramBot(bot: TelegramBot) {
   // Web App command
   bot.onText(/\/webapp/, async (msg) => {
     const chatId = msg.chat.id;
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const frontendUrl = process.env.FRONTEND_URL || "https://minties.vercel.app";
 
     await bot.sendMessage(chatId, "📱 *Minties Mini App*", {
       parse_mode: "Markdown",
@@ -103,7 +103,7 @@ Need help? Contact support: @mintiessupport
 
   // Inline Query Handler (Search Bar Integration)
   bot.on("inline_query", async (query) => {
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const frontendUrl = process.env.FRONTEND_URL || "https://minties.vercel.app";
     const results: TelegramBot.InlineQueryResult[] = [
       {
         type: "article",
@@ -179,7 +179,7 @@ Need help? Contact support: @mintiessupport
             [
               {
                 text: "🚀 Open Mini App",
-                web_app: { url: process.env.FRONTEND_URL || "http://localhost:3000" },
+                web_app: { url: process.env.FRONTEND_URL || "https://minties.vercel.app" },
               },
             ],
           ],
@@ -232,7 +232,7 @@ Need help? Contact support: @mintiessupport
   });
 
   // Configure Menu Button
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+  const frontendUrl = process.env.FRONTEND_URL || "https://minties.vercel.app";
   try {
     // @ts-ignore
     bot.setChatMenuButton({
