@@ -10,7 +10,6 @@ export default function ConnectPage() {
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(48,240,168,0.08),transparent_40%)]">
-      <NavBar />
       <div className="max-w-lg mx-auto px-4 py-8 md:px-6 md:py-10 space-y-6">
         <div className="card p-6 space-y-4">
           <div className="space-y-2">

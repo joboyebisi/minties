@@ -156,21 +156,25 @@ export async function setupMoneyBoxRecurringTransfer({
   walletClient,
   sessionAccountAddress,
   monthlyAmount,
-  months
+  frequency = 'monthly',
+  duration
 }: {
   walletClient: any;
   sessionAccountAddress: Address;
   monthlyAmount: string;
-  months: number;
+  frequency?: 'daily' | 'weekly' | 'monthly';
+  duration: number;
 }) {
-  const expiry = calculateExpiry(months * 30);
+  const durationDays = frequency === 'daily' ? 1 : frequency === 'weekly' ? 7 : 30;
+  const expiry = calculateExpiry(duration * durationDays);
+
   return requestRecurringTransferPermission({
     walletClient: asWalletClient(walletClient),
     sessionAccountAddress,
     periodAmount: monthlyAmount,
-    periodDuration: PERIOD_DURATIONS.monthly,
+    periodDuration: PERIOD_DURATIONS[frequency],
     expiry,
-    justification: `MoneyBox auto-save: ${monthlyAmount} USDC/month`
+    justification: `MoneyBox auto-save: ${monthlyAmount} USDC/${frequency}`
   });
 }
 

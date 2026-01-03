@@ -31,28 +31,36 @@ export default function SendGiftPage() {
     const [shareLink, setShareLink] = useState("");
 
     const handleCreateGift = async () => {
-        if (!walletClient || !address) return;
+        if (!walletClient || !address) {
+            show("error", "Wallet not connected");
+            return;
+        }
         setLoading(true);
 
         try {
             // 1. If recurring, request permission
             if (formData.recurring) {
-                // We need a smart account for this
-                // PermissionGuard wraps the content so we assume we have capabilities or will fail gracefully
-                const client = createWalletClientWithPermissions();
-
-                await setupRecurringGift({
-                    walletClient: client as any,
-                    sessionAccountAddress: address,
-                    amount: formData.amount,
-                    frequency: formData.frequency,
-                    duration: parseInt(formData.duration)
-                });
-
-                show("success", "Recurring gift permission granted!");
+                console.log("Requesting recurring gift permission...");
+                try {
+                    const client = createWalletClientWithPermissions();
+                    await setupRecurringGift({
+                        walletClient: client as any,
+                        sessionAccountAddress: address,
+                        amount: formData.amount,
+                        frequency: formData.frequency,
+                        duration: parseInt(formData.duration)
+                    });
+                    show("success", "Recurring gift permission granted!");
+                } catch (err: any) {
+                    console.error("Permission request failed", err);
+                    show("error", "Permission denied or failed. Check console.");
+                    setLoading(false);
+                    return; // Stop flow
+                }
             }
 
             // 2. Create the initial gift on-chain
+            console.log("Creating gift on-chain...");
             // Generate ID
             const { keccak256, toBytes, concat } = await import("viem");
             const timestamp = Date.now().toString();
@@ -66,6 +74,7 @@ export default function SendGiftPage() {
                 giftType: formData.recurring ? 2 : 0, // 0=Single, 2=Scheduled/Recurring logic
                 maxClaims: formData.recurring ? parseInt(formData.duration) : 1,
             });
+            console.log("Gift created on-chain:", hash);
 
             const frontendUrl = window.location.origin;
             const link = `${frontendUrl}/gift/claim?id=${id}`;
@@ -74,21 +83,26 @@ export default function SendGiftPage() {
             setShareLink(link);
 
             // Save to local storage for dashboard
-            const { saveItem } = await import("@/lib/local-db");
-            saveItem("gifts", {
-                id: id,
-                amount: parseFloat(formData.amount),
-                recipient: formData.recipient || "Anyone"
-            });
+            try {
+                const { saveItem } = await import("@/lib/local-db");
+                saveItem("gifts", {
+                    id: id,
+                    amount: parseFloat(formData.amount),
+                    recipient: formData.recipient || "Anyone"
+                });
+            } catch (e) {
+                console.warn("Local save failed", e);
+            }
 
             setStep("success");
 
             // Notify
-            await createNotification({
+            // Don't await notification failure
+            createNotification({
                 user_id: address,
                 type: 'gift_sent',
                 message: `Sent a gift of ${formData.amount} USDC${formData.recipient ? ` to ${formData.recipient}` : ''}`,
-            });
+            }).catch(console.error);
 
             show("success", "Gift created! Share the link.");
 
@@ -160,7 +174,9 @@ export default function SendGiftPage() {
     const renderCustomizeStep = () => (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
             <div className="card p-5 space-y-4">
-                <h3 className="font-semibold text-[#e8fdf4]">Customize Gift</h3>
+                <h3 className="font-semibold text-[#e8fdf4] flex items-center gap-2">
+                    <Gift size={20} className="text-[#30f0a8]" /> Customize Gift
+                </h3>
 
                 <div>
                     <label className="label">Message</label>
@@ -172,28 +188,26 @@ export default function SendGiftPage() {
                     />
                 </div>
 
-                <PermissionGuard fallback={null}>
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-[rgba(48,240,168,0.05)] border border-[#1e2a24]">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-full bg-[rgba(48,240,168,0.1)] text-[#30f0a8]">
-                                <Repeat size={20} />
-                            </div>
-                            <div>
-                                <p className="text-[#e8fdf4] font-medium">Make it Recurring</p>
-                                <p className="text-xs text-[#8da196]">Send as an allowance</p>
-                            </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-[rgba(48,240,168,0.05)] border border-[#1e2a24]">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-[rgba(48,240,168,0.1)] text-[#30f0a8]">
+                            <Repeat size={20} />
                         </div>
-                        <input
-                            type="checkbox"
-                            className="toggle toggle-success"
-                            checked={formData.recurring}
-                            onChange={e => setFormData({ ...formData, recurring: e.target.checked })}
-                        />
+                        <div>
+                            <p className="text-[#e8fdf4] font-medium">Make it Recurring</p>
+                            <p className="text-xs text-[#8da196]">Send {formData.amount} USDC regularly</p>
+                        </div>
                     </div>
-                </PermissionGuard>
+                    <input
+                        type="checkbox"
+                        className="toggle toggle-success"
+                        checked={formData.recurring}
+                        onChange={e => setFormData({ ...formData, recurring: e.target.checked })}
+                    />
+                </div>
 
                 {formData.recurring && (
-                    <div className="grid grid-cols-2 gap-4 pl-2 border-l-2 border-[#1e2a24]">
+                    <div className="space-y-4 pl-2 border-l-2 border-[#1e2a24] animate-in slide-in-from-top-2">
                         <div>
                             <label className="label">Frequency</label>
                             <select
@@ -207,13 +221,21 @@ export default function SendGiftPage() {
                             </select>
                         </div>
                         <div>
-                            <label className="label">Duration (# periods)</label>
+                            <label className="label">Duration (# of times to send)</label>
                             <input
                                 type="number"
+                                min="1"
                                 className="input w-full"
                                 value={formData.duration}
                                 onChange={e => setFormData({ ...formData, duration: e.target.value })}
                             />
+                            <p className="text-xs text-[#8da196] mt-1">
+                                Total: {(parseFloat(formData.amount || "0") * parseInt(formData.duration || "0")).toFixed(2)} USDC
+                            </p>
+                        </div>
+
+                        <div className="p-3 bg-[rgba(48,240,168,0.05)] rounded-lg text-xs text-[#bfe8d7]">
+                            You will be asked to sign a permission to allow Minties to send <strong>{formData.amount} USDC</strong> every <strong>{formData.frequency}</strong> for <strong>{formData.duration}</strong> periods.
                         </div>
                     </div>
                 )}
@@ -226,7 +248,7 @@ export default function SendGiftPage() {
             >
                 {loading ? "Creating..." : (
                     <>
-                        <Gift size={18} /> Send Gift
+                        <Gift size={18} /> {formData.recurring ? "Setup Recurring Gift" : "Send Gift"}
                     </>
                 )}
             </button>

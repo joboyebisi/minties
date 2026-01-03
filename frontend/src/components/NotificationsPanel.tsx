@@ -44,10 +44,23 @@ export function NotificationsPanel() {
         }
     };
 
+    // Add click outside handler
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (isOpen && !target.closest('.notifications-container')) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isOpen]);
+
     if (!address) return null;
 
     return (
-        <div className="relative">
+        <div className="relative notifications-container">
             <button
                 onClick={handleOpen}
                 className="relative p-2 rounded-full hover:bg-[rgba(48,240,168,0.1)] transition text-[#30f0a8]"
