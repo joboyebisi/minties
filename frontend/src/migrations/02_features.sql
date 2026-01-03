@@ -43,3 +43,18 @@ CREATE POLICY "Public insert savings_circles" ON savings_circles FOR INSERT WITH
 CREATE POLICY "Public read gifts" ON gifts FOR SELECT USING (true);
 CREATE POLICY "Public insert gifts" ON gifts FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public update gifts" ON gifts FOR UPDATE USING (true);
+
+-- Contacts (Synced from Telegram)
+CREATE TABLE IF NOT EXISTS contacts (
+    telegram_user_id BIGINT PRIMARY KEY,
+    phone_number TEXT NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    wallet_address TEXT, -- Optional linkage
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read contacts" ON contacts FOR SELECT USING (true);
+CREATE POLICY "Public insert contacts" ON contacts FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public update contacts" ON contacts FOR UPDATE USING (true);

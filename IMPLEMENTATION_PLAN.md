@@ -1,63 +1,68 @@
-# implementation_plan.md
+# Telegram Mini App Improvements Plan
 
-# Goal
-Implement "MoneyBox" (Savings Goal with Aave + Recurring), "Send Gifts" (Fintech-style with Recurring), and "Savings Circle" (Multi-step + Routing), powered by **MetaMask Smart Accounts** and **Advanced Permissions (ERC-7715)** for recurring capabilities.
+## Goal
+Enable native Telegram Mini App features including contacts request, sharing, home screen shortcuts, and haptic feedback by upgrading the integration to support Bot API 8.0+.
 
 ## User Review Required
--   **Contract Addresses**: Need deployed addresses for `SavingsCircle` and `GiftEscrow` contracts.
--   **Envio API**: Need the Envio Indexer GraphQL endpoint for real-time data fetching.
+- **Testing**: These features rely on the Telegram Native environment. Verification will require deploying to a test URL or running via a tunnel (ngrok) inside Telegram, or using the Telegram Mock/Debug tools.
 
 ## Proposed Changes
 
-### 1. MoneyBox Feature (Priority 1 - Aave Integration)
--   **`app/moneybox/create/page.tsx`**:
-    -   Integrate `supplyUsdc` from `lib/aave.ts`.
-    -   Handle "Deposit to Aave" transaction flow.
--   **`app/moneybox/[id]/page.tsx`**:
-    -   Show Aave balance (aUSDC) as "Current Savings".
-    -   Implement "Withdraw" button using `withdrawUsdc`.
-    -   **Real-time**: Poll Aave contract or usage Envio if available for balance updates.
+### Frontend Types
+#### [MODIFY] [telegram-web-app.d.ts](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/types/telegram-web-app.d.ts)
+- Add missing Bot API 8.0+ definitions:
+  - `shareMessage`, `shareToStory`
+  - `addToHomeScreen`, `checkHomeScreenStatus`
+  - `requestContact` (ensure correct signature)
+  - `HapticFeedback` (verify completeness)
+  - `LocationManager`, `Accelerometer`, etc. (if relevant)
 
-### 2. Savings Circle (Priority 2 - Vaults)
--   **`lib/transactions.ts`**:
-    -   Update `SAVINGS_CIRCLE_ADDRESS` with real address.
--   **`app/circle/create/page.tsx`**:
-    -   Call `createCircle` transaction.
--   **`app/circle/[id]/page.tsx`**:
-    -   Call `contributeToCircle` and `withdrawFromCircle`.
-    -   Fetch real-time vault balance/participants (needs Envio or direct contract reads).
+### Frontend Logic
+#### [MODIFY] [useTelegram.ts](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/hooks/useTelegram.ts)
+- Expose new methods:
+  - `requestContact()`
+  - `shareToStory(mediaUrl, params)`
+  - `shareMessage(msg_id)`
+  - `addToHomeScreen()`
+  - `checkHomeScreenStatus()`
+- Expose new state:
+  - `isFullscreen`, `isActive`
+  - `safeAreaInset`
 
-### 3. Send Gifts (Priority 3 - Escrow & Onboarding)
--   **`lib/transactions.ts`**:
-    -   Update `GIFT_ESCROW_ADDRESS`.
--   **`app/gift/send/page.tsx`**:
-    -   Call `createGift` (Escrow).
--   **`app/gift/claim/page.tsx`**:
-    -   Call `claimGift` to withdraw funds to wallet.
+### Frontend UI
+#### [NEW] [TelegramFeatures.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/TelegramFeatures.tsx) (Optional Demo Component)
+- A component to demonstrate/test these features:
+  - "Share to Story" button
+  - "Add to Home Screen" button
+  - "Share Contact" button
 
-### 4. Real-time Infrastructure (Priority 4 - Envio)
--   **`lib/envio.ts` (NEW)**:
-    -   Setup GraphQL client.
-    -   Queries for `UserBalances`, `CircleEvents`, `GiftEvents`.
--   **`components/UserDashboard.tsx`**:
-    -   Replace mock data with `useEnvio` hooks.
+#### [MODIFY] [UserDashboard.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/UserDashboard.tsx)
+- Integrate helpful shortcuts where relevant (e.g. sharing invite link via native share).
 
-### 5. Smart Account & Permissions (Completed/Ongoing)
--   **Status**: Profile & Invite logic Implemented.
--   **Next**: Integrate recurring permissions into MoneyBox/Circle flows once basic txs work.
+### Backend Bot Logic
+#### [MODIFY] [bot.ts](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/backend/src/telegram/bot.ts)
+- **Menu Button**: Ensure `setChatMenuButton` is configured to launch the Web App.
+- **Inline Mode**: Implement `bot.on("inline_query")` to allow users to search/share "Moneybox" or "Gift" links directly from the message bar.
+- **Bot Buttons**: 
+  - Update `/start` and generic keyboards to include specific "💰 My Moneybox" and "🎁 Send Gift" buttons.
+  - Use rich emojis/icons for all buttons.
+
+### Frontend UI
+#### [NEW] [TelegramFeatures.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/TelegramFeatures.tsx) (Demo Component)
+- "Share to Story", "Add to Home Screen", "Share Contact" buttons.
+
+#### [MODIFY] [UserDashboard.tsx](file:///c:/Users/Deborah/Documents/Cursor%20Projects/Minties/frontend/src/components/UserDashboard.tsx)
+- Integrate helpful shortcuts where relevant (e.g. sharing invite link via native share).
 
 ## Verification Plan
 
-### Automated Tests
--   Jest tests for util functions in `metamask-permissions.ts`.
-
 ### Manual Verification
-1.  **MoneyBox (Aave)**:
-    -   Create Goal -> Deposit 10 USDC -> Verify Aave balance increases.
-    -   Withdraw 5 USDC -> Verify wallet balance increases.
-2.  **Savings Circle**:
-    -   Create Circle -> Verify notification/event.
-    -   Contribute -> Verify Vault balance.
-3.  **Gifts**:
-    -   Send Gift (Escrow) -> Verify funds deducted.
-    -   Claim Gift (Recipient) -> Verify funds received.
+1.  **Mock Environment**: Use the [Telegram Web App emulator](https://web.telegram.org/) or browser console to mock `window.Telegram.WebApp` methods.
+2.  **Deployment**: Deploy to Vercel.
+3.  **Real Device**:
+    - **Sharing**: Click "Share to Story" -> System sheet should open.
+    - **Shortcuts**: Click "Add to Home Screen" -> Prompt should appear.
+    - **Birthdays**: Add a birthday manually. Verify it saves to Supabase.
+4.  **Bot Interaction**:
+    - Type `@BotName` in chat -> Show "My Moneybox".
+    - Check Menu Button -> "Open App".

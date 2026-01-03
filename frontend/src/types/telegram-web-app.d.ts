@@ -79,6 +79,59 @@ declare global {
           removeItems: (keys: string[], callback?: (error: Error | null, success: boolean) => void) => void;
           getKeys: (callback: (error: Error | null, keys: string[]) => void) => void;
         };
+        // Bot API 8.0+ Additions
+        shareMessage: (msg_id: string, callback?: (success: boolean) => void) => void;
+        shareToStory: (media_url: string, params?: { text?: string; widget_link?: { url: string; name?: string } }) => void;
+        requestFullscreen: () => void;
+        exitFullscreen: () => void;
+        addToHomeScreen: () => void;
+        checkHomeScreenStatus: (callback?: (status: "unsupported" | "unknown" | "added" | "missed") => void) => void;
+        setEmojiStatus: (custom_emoji_id: string, params?: { duration?: number }, callback?: (success: boolean) => void) => void;
+        requestEmojiStatusAccess: (callback?: (granted: boolean) => void) => void;
+        downloadFile: (params: { url: string; file_name: string }, callback?: (accepted: boolean) => void) => void;
+
+        // Location & Sensors (Bot API 8.0+)
+        LocationManager: {
+          isInited: boolean;
+          isLocationAvailable: boolean;
+          isAccessRequested: boolean;
+          isAccessGranted: boolean;
+          init: (callback?: () => void) => void;
+          getLocation: (callback: (data: null | {
+            latitude: number;
+            longitude: number;
+            altitude?: number;
+            speed?: number;
+          }) => void) => void;
+          openSettings: () => void;
+        };
+        Accelerometer: {
+          isStarted: boolean;
+          x: number;
+          y: number;
+          z: number;
+          start: (params: { refresh_rate?: number }, callback?: (success: boolean) => void) => void;
+          stop: (callback?: (success: boolean) => void) => void;
+        };
+        DeviceOrientation: {
+          isStarted: boolean;
+          absolute: boolean;
+          alpha: number;
+          beta: number;
+          gamma: number;
+          start: (params: { refresh_rate?: number; need_absolute?: boolean }, callback?: (success: boolean) => void) => void;
+          stop: (callback?: (success: boolean) => void) => void;
+        };
+        Gyroscope: {
+          isStarted: boolean;
+          x: number;
+          y: number;
+          z: number;
+          start: (params: { refresh_rate?: number }, callback?: (success: boolean) => void) => void;
+          stop: (callback?: (success: boolean) => void) => void;
+        };
+
+        // Existing methods
         ready: () => void;
         expand: () => void;
         close: () => void;
@@ -104,18 +157,35 @@ declare global {
         readTextFromClipboard: (callback?: (text: string) => void) => void;
         requestWriteAccess: (callback?: (granted: boolean) => void) => void;
         requestContact: (callback?: (granted: boolean) => void) => void;
-        onEvent: (eventType: string, eventHandler: () => void) => void;
-        offEvent: (eventType: string, eventHandler: () => void) => void;
+        onEvent: (eventType: string, eventHandler: (...args: any[]) => void) => void;
+        offEvent: (eventType: string, eventHandler: (...args: any[]) => void) => void;
         setHeaderColor: (color: string) => void;
         setBackgroundColor: (color: string) => void;
         enableClosingConfirmation: () => void;
         disableClosingConfirmation: () => void;
         onClose: (callback: () => void) => void;
         offClose: (callback: () => void) => void;
+
+        // New fields
+        isActive: boolean;
+        isFullscreen: boolean;
+        isOrientationLocked: boolean;
+        safeAreaInset: {
+          top: number;
+          bottom: number;
+          left: number;
+          right: number;
+        };
+        contentSafeAreaInset: {
+          top: number;
+          bottom: number;
+          left: number;
+          right: number;
+        };
       };
     };
   }
 }
 
-export {};
+export { };
 

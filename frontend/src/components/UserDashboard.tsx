@@ -10,6 +10,7 @@ import { PermissionGuard } from "./PermissionGuard";
 import { getProfile } from "@/lib/supabase";
 import { useState, useEffect } from "react";
 import { ProfileModal } from "./ProfileModal";
+import { TelegramFeatures } from "./TelegramFeatures";
 
 // Types for items
 type MoneyBox = { id: string; title: string; progress: number; target: number };
@@ -84,6 +85,7 @@ export function UserDashboard() {
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+            <TelegramFeatures />
             {/* Header & Balance Card */}
             <div className="grid gap-4 sm:grid-cols-2">
                 <div className="flex flex-col justify-center gap-1">

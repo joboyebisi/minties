@@ -11,31 +11,34 @@ export function setupTelegramBot(bot: TelegramBot) {
     const chatId = msg.chat.id;
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
-    // Send welcome message with Mini App button
-    await bot.sendMessage(chatId, "🎁 Welcome to Minties!", {
+    // Send welcome message with Rich Menu
+    await bot.sendMessage(chatId, "🎁 *Welcome to Minties!*", {
+      parse_mode: "Markdown",
       reply_markup: {
         inline_keyboard: [
           [
             {
-              text: "🚀 Open Mini App",
+              text: "🚀 Open Minties App",
               web_app: { url: frontendUrl },
             },
           ],
+          [
+            {
+              text: "💰 My Moneybox",
+              web_app: { url: `${frontendUrl}/moneybox` },
+            },
+            {
+              text: "🎁 Send Gift",
+              web_app: { url: `${frontendUrl}/gift/send` },
+            }
+          ],
+          [
+            { text: "👥 Join Circle", callback_data: "join_circle_help" },
+            { text: "❓ Help", callback_data: "help" }
+          ]
         ],
       },
     });
-
-    const welcomeMessage = `
-Send crypto gifts, schedule transactions, and start savings circles with friends on Telegram!
-
-Commands:
-/gift - Create a claimable USDC gift link
-/circle - Create or join a savings circle
-/wallet - Connect your MetaMask wallet
-/webapp - Open the Mini App
-/help - Show all commands
-    `;
-    await bot.sendMessage(chatId, welcomeMessage);
   });
 
   // Web App command
@@ -43,12 +46,13 @@ Commands:
     const chatId = msg.chat.id;
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
-    await bot.sendMessage(chatId, "Opening Minties Mini App...", {
+    await bot.sendMessage(chatId, "📱 *Minties Mini App*", {
+      parse_mode: "Markdown",
       reply_markup: {
         inline_keyboard: [
           [
             {
-              text: "🚀 Open Mini App",
+              text: "🚀 Launch App",
               web_app: { url: frontendUrl },
             },
           ],
@@ -60,28 +64,94 @@ Commands:
   // Help command
   bot.onText(/\/help/, async (msg) => {
     const chatId = msg.chat.id;
-    const helpMessage = `
-📖 Minties Commands:
+    await sendHelpMessage(bot, chatId);
+  });
 
-🎁 Gifts:
+  // Callback Query Handler
+  bot.on("callback_query", async (query) => {
+    const chatId = query.message?.chat.id;
+    if (!chatId) return;
+
+    if (query.data === "help") {
+      await sendHelpMessage(bot, chatId);
+    } else if (query.data === "join_circle_help") {
+      await bot.sendMessage(chatId, "To join a circle, ask your friend for an invite link or create one in the app!");
+    }
+  });
+
+  // Helper for Help Message
+  async function sendHelpMessage(bot: TelegramBot, chatId: number) {
+    const helpMessage = `
+📖 *Minties Commands*:
+
+🎁 *Gifts*:
 /gift create - Create a new gift
 /gift claim <link> - Claim a gift from a link
-/gift list - List your created gifts
 
-💰 Savings Circles:
+💰 *Savings Circles*:
 /circle create - Create a new savings circle
 /circle join <id> - Join a savings circle
-/circle contribute <id> <amount> - Contribute to a circle
-/circle status <id> - Check circle status
 
-🔐 Wallet:
+🔐 *Wallet*:
 /wallet connect - Connect MetaMask wallet
-/wallet address - Show your wallet address
 /wallet balance - Check your USDC balance
 
 Need help? Contact support: @mintiessupport
     `;
-    await bot.sendMessage(chatId, helpMessage);
+    await bot.sendMessage(chatId, helpMessage, { parse_mode: "Markdown" });
+  }
+
+  // Inline Query Handler (Search Bar Integration)
+  bot.on("inline_query", async (query) => {
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const results: TelegramBot.InlineQueryResult[] = [
+      {
+        type: "article",
+        id: "moneybox",
+        title: "💰 My Moneybox",
+        description: "Check your savings goals",
+        input_message_content: {
+          message_text: "I'm checking my savings goals on Minties! 🎯",
+        },
+        reply_markup: {
+          inline_keyboard: [[
+            { text: "View Moneybox 💰", web_app: { url: `${frontendUrl}/moneybox` } }
+          ]]
+        },
+        thumb_url: "https://emojigraph.org/media/apple/money-bag_1f4b0.png"
+      },
+      {
+        type: "article",
+        id: "send_gift",
+        title: "🎁 Send a Gift",
+        description: "Send crypto to a friend",
+        input_message_content: {
+          message_text: "Here's a gift for you! 🎁",
+        },
+        reply_markup: {
+          inline_keyboard: [[
+            { text: "Claim Gift 🎁", web_app: { url: `${frontendUrl}/gift/claim` } } // Generic claim landing
+          ]]
+        },
+        thumb_url: "https://emojigraph.org/media/apple/wrapped-gift_1f381.png"
+      },
+      {
+        type: "article",
+        id: "invite",
+        title: "👋 Invite Friend",
+        description: "Invite friends to Minties",
+        input_message_content: {
+          message_text: "Join me on Minties to save and earn! 🚀",
+        },
+        reply_markup: {
+          inline_keyboard: [[
+            { text: "Join Minties 🚀", web_app: { url: frontendUrl } }
+          ]]
+        }
+      }
+    ];
+
+    await bot.answerInlineQuery(query.id, results, { cache_time: 0 });
   });
 
   // Gift commands
@@ -99,14 +169,11 @@ Need help? Contact support: @mintiessupport
   // Stats/Profile command
   bot.onText(/\/stats/, async (msg) => {
     const chatId = msg.chat.id;
-    const userId = msg.from?.id;
-    if (!userId) return;
-
-    // TODO: Fetch from Supabase and show user stats
     await bot.sendMessage(
       chatId,
-      `📊 Your Stats:\n\nUse the Mini App to see your points, badges, and progress!`,
+      `📊 *Your Stats:*\n\nUse the Mini App to see your points, badges, and progress!`,
       {
+        parse_mode: "Markdown",
         reply_markup: {
           inline_keyboard: [
             [
@@ -134,30 +201,24 @@ Need help? Contact support: @mintiessupport
         if (data.type === "gift_claimed") {
           await bot.sendMessage(
             chatId,
-            `✅ Gift claimed successfully!\n\nAmount: ${data.amount} USDC\nTransaction: ${data.txHash || "Pending"}`
+            `✅ *Gift claimed successfully!*\n\nAmount: ${data.amount} USDC\nTransaction: \`${data.txHash || "Pending"}\``,
+            { parse_mode: "Markdown" }
           );
         } else if (data.type === "gift_sent") {
           await bot.sendMessage(
             chatId,
-            `🎁 Gift sent!\n\nRecipient: ${data.recipient}\nAmount: ${data.amount} USDC\nLink: ${data.giftLink || "Generated"}`
+            `🎁 *Gift sent!*\n\nRecipient: ${data.recipient}\nAmount: ${data.amount} USDC`,
+            { parse_mode: "Markdown" }
           );
         } else if (data.type === "circle_contribution") {
           await bot.sendMessage(
             chatId,
-            `✅ Contribution made!\n\nCircle: ${data.circleId}\nAmount: ${data.amount} USDC`
-          );
-        } else if (data.type === "savings_goal_created") {
-          await bot.sendMessage(
-            chatId,
-            `🎯 Savings goal created!\n\nTarget: ${data.targetAmount} USDC\nMonths: ${data.months}\nYou earned ${data.pointsEarned || 50} points!`
-          );
-        } else if (data.type === "invite_shared") {
-          await bot.sendMessage(
-            chatId,
-            `📤 Invite shared!\n\nCode: ${data.inviteCode}\nShare this code with friends to earn points when they join!`
+            `✅ *Contribution made!*\n\nCircle: ${data.circleId}\nAmount: ${data.amount} USDC`,
+            { parse_mode: "Markdown" }
           );
         } else {
-          await bot.sendMessage(chatId, `✅ Action completed: ${data.type || "unknown"}`);
+          // Default ack
+          // await bot.sendMessage(chatId, "✅ Received app data");
         }
       } catch (error) {
         console.error("Error processing Mini App data:", error);
@@ -173,11 +234,11 @@ Need help? Contact support: @mintiessupport
   // Configure Menu Button
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
   try {
-    // @ts-ignore - setChatMenuButton might not be in typed definition yet
+    // @ts-ignore
     bot.setChatMenuButton({
       menu_button: {
         type: "web_app",
-        text: "Launch App",
+        text: "Open Minties",
         web_app: { url: frontendUrl }
       }
     });
@@ -185,19 +246,16 @@ Need help? Contact support: @mintiessupport
     console.warn("Failed to set menu button:", error);
   }
 
-  // Handle Contact Sharing
+  // Handle Contact Sharing (Legacy/Direct)
   bot.on("contact", async (msg) => {
     const chatId = msg.chat.id;
     const contact = msg.contact;
-
     if (!contact || !msg.from) return;
 
-    // Verify contact belongs to sender (security check)
     if (contact.user_id !== msg.from.id) {
-      await bot.sendMessage(chatId, "⚠️ Please share your own contact.");
+      await bot.sendMessage(chatId, "⚠️ Please share your *own* contact.", { parse_mode: "Markdown" });
       return;
     }
-
     try {
       if (supabase) {
         // Sync to Supabase
