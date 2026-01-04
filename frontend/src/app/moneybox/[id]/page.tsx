@@ -68,7 +68,9 @@ export default function MoneyBoxDashboardPage() {
                     targetAmount: found.target_amount || found.target || 0, // Handle DB vs Local casing
                     currentAmount: (found.target_amount || found.target || 0) * ((found.progress || 0) / 100), // Estimate amount if not stored explicitly
                     progress: found.progress || 0,
-                    autoSave: false, // Default for now unless stored
+                    autoSave: !!found.recurring_amount, // Use existence of amount to determine auto-save
+                    monthlyAmount: found.recurring_amount || 0, // Map to display field
+                    frequency: found.contribution_frequency || 'monthly',
                     yieldEarned: 0 // Fetch real yield later if possible
                 });
             } else {
@@ -237,7 +239,7 @@ export default function MoneyBoxDashboardPage() {
                         <div>
                             <h3 className="font-semibold text-[#e8fdf4]">Auto-Save Active</h3>
                             <p className="text-sm text-[#8da196]">
-                                Next pull: ${goal.monthlyAmount} on {new Date(Date.now() + 86400000).toLocaleDateString()}
+                                Next pull: ${goal.monthlyAmount.toFixed(2)} {goal.frequency === 'daily' ? 'tomorrow' : `on ${new Date(Date.now() + (goal.frequency === 'weekly' ? 604800000 : 2592000000)).toLocaleDateString()}`}
                             </p>
                         </div>
                     </div>

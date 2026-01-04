@@ -139,6 +139,10 @@ function CreateMoneyBoxForm() {
                 title: formData.title,
                 target_amount: parseFloat(formData.targetAmount),
                 progress: formData.enableYield && amount > 0 ? ((contributionPerPeriod / parseFloat(formData.targetAmount)) * 100) : 0,
+                // Add recurring details
+                recurring_amount: formData.autoSave ? contributionPerPeriod : 0,
+                contribution_frequency: formData.autoSave ? formData.durationUnit : null,
+                total_duration: formData.autoSave ? parseInt(formData.durationValue) : null
             };
 
             // 1. Save to Supabase (Primary)
@@ -161,10 +165,8 @@ function CreateMoneyBoxForm() {
             try {
                 const { saveItem } = await import("@/lib/local-db");
                 saveItem("moneyBoxes", {
-                    id: newBox.id,
-                    title: newBox.title,
-                    target: newBox.target_amount,
-                    progress: newBox.progress
+                    ...newBox, // Save all fields including recurring ones
+                    target: newBox.target_amount, // maintaining compat with some local views if they use 'target'
                 });
             } catch (e) { console.error(e); }
 
