@@ -67,9 +67,10 @@ function CreateMoneyBoxForm() {
     const contributionPerPeriod = amount / durationVal;
 
     // Yield Calculation (using fetched APY)
+    const safeApy = (typeof apy === 'number' && !isNaN(apy)) ? apy : 5.0; // Fallback to 5% if loading/error
     const yearFraction = durationVal / (formData.durationUnit === 'monthly' ? 12 : formData.durationUnit === 'weekly' ? 52 : 365);
-    const projectedYield = formData.enableYield ? (amount * (apy / 100) * yearFraction) : 0;
-    const totalProjected = amount + projectedYield;
+    const projectedYield = formData.enableYield && amount > 0 ? (amount * (safeApy / 100) * yearFraction) : 0;
+    const totalProjected = amount + (isNaN(projectedYield) ? 0 : projectedYield);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
