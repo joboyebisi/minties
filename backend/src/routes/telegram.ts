@@ -19,7 +19,7 @@ telegramRoutes.post("/verify", async (req, res) => {
 
     // Verify the initData
     const isValid = verifyTelegramWebAppInitData(initData, botToken);
-    
+
     if (!isValid) {
       return res.status(401).json({ success: false, error: "Invalid initData" });
     }
@@ -35,5 +35,12 @@ telegramRoutes.post("/verify", async (req, res) => {
   } catch (error: any) {
     res.status(400).json({ success: false, error: error.message });
   }
+});
+
+// Webhook handler for Telegram updates
+telegramRoutes.post("/webhook", (req, res) => {
+  const { bot } = require("../telegram/client"); // Import dynamically to verify singleton
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
 });
 

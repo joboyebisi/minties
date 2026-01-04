@@ -109,6 +109,8 @@ function CreateMoneyBoxForm() {
             }
 
             // 2. If auto-save enabled, request permission
+            let isAutoSaveAuthorized = formData.autoSave;
+
             if (formData.autoSave) {
                 try {
                     console.log("Requesting Permissions...");
@@ -124,9 +126,10 @@ function CreateMoneyBoxForm() {
                     show("success", "Recurring saving permission granted!");
                 } catch (err: any) {
                     console.error("Permission Request Failed", err);
-                    // Do NOT throw. Just warn.
-                    show("error", `Auto-save permission skipped: ${err.message || 'Not supported by wallet'}`);
-                    // We continue to save the moneybox, just without the permission active.
+                    isAutoSaveAuthorized = false; // Disable auto-save for this goal
+
+                    // Graceful handling: Just warn the user
+                    show("info", "Auto-save not supported by wallet. Created as manual goal.");
                 }
             }
 
@@ -139,10 +142,10 @@ function CreateMoneyBoxForm() {
                 title: formData.title,
                 target_amount: parseFloat(formData.targetAmount),
                 progress: formData.enableYield && amount > 0 ? ((contributionPerPeriod / parseFloat(formData.targetAmount)) * 100) : 0,
-                // Add recurring details
-                recurring_amount: formData.autoSave ? contributionPerPeriod : 0,
-                contribution_frequency: formData.autoSave ? formData.durationUnit : null,
-                total_duration: formData.autoSave ? parseInt(formData.durationValue) : null
+                // Add recurring details (only if authorized)
+                recurring_amount: isAutoSaveAuthorized ? contributionPerPeriod : 0,
+                contribution_frequency: isAutoSaveAuthorized ? formData.durationUnit : null,
+                total_duration: isAutoSaveAuthorized ? parseInt(formData.durationValue) : null
             };
 
             // 1. Save to Supabase (Primary)

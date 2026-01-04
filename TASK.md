@@ -16,3 +16,16 @@
 - [x] Implement Notifications System (DB + UI) <!-- id: 15 -->
 - [x] Implement Activity Dashboard (Envio Integration) <!-- id: 16 -->
 - [x] Final Cleanup of Repo <!-- id: 17 -->
+
+## Phase 4: Final UX Polish & Debugging (User Feedback)
+- [x] Refine MoneyBox Creation UI (Descriptions, Back Btn, Frequency) <!-- id: 18 -->
+- [x] Switch Telegram Bot to Webhook (Production) <!-- id: 25 -->
+- [x] Verify Gift Link Format <!-- id: 26 -->
+- [x] Setup Testing Framework (Vitest) <!-- id: 27 -->
+- [x] Write Permission Payload Tests <!-- id: 28 -->
+- [x] Add Code Usage Permalinks to README <!-- id: 29 -->
+- [x] Verify Recurring Permission Period Display <!-- id: 30 -->
+- [x] Fix Aave Supply Gas Error (Added Balance Check & Approval Receipt) <!-- id: 31 -->
+- [x] Enable Aave Supply Simulation Mode (Bypass for Demo/Zero Funds) <!-- id: 32 -->
+- [ ] Fix Notifications Panel Visibility (Toggle) <!-- id: 23 -->
+- [x] Fix Recursive Gift Flow & Permissions <!-- id: 24 -->

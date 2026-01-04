@@ -174,8 +174,27 @@ export async function supplyUsdc({
 
   console.log("Waiting for approval to be mined...", approveTx);
   await publicClient.waitForTransactionReceipt({ hash: approveTx });
-  console.log("Approval confirmed. Waiting for propagation...");
-  await new Promise(resolve => setTimeout(resolve, 3000)); // Increase wait to 3s
+  // 3b. Poll for allowance propagation (Critical for avoiding "Likely to fail" errors)
+  console.log("Polling for allowance update...");
+  let retries = 0;
+  while (retries < 15) { // Try for 30 seconds
+    const checkAllowance = await publicClient.readContract({
+      address: USDC_ADDRESS,
+      abi: erc20Abi,
+      functionName: "allowance",
+      args: [accountAddress, AAVE_POOL_ADDRESS],
+    }) as bigint;
+
+    console.log(`Allowance check ${retries + 1}: ${checkAllowance.toString()} / ${parsed.toString()}`);
+
+    if (checkAllowance >= parsed) {
+      console.log("Allowance confirmed on-chain!");
+      break;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    retries++;
+  }
 
   // 4. Supply to Aave
   console.log("Supplying to Aave contract...");
