@@ -161,6 +161,12 @@ export default function MoneyBoxDashboardPage() {
             const { deleteMoneyBox } = await import("@/lib/supabase");
             await deleteMoneyBox(id);
 
+            // 3. Delete from Local
+            try {
+                const { deleteItem } = await import("@/lib/local-db");
+                deleteItem("moneyBoxes", id);
+            } catch (e) { }
+
             show("success", "Goal deleted!");
             router.push("/");
         } catch (e: any) {
