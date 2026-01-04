@@ -21,6 +21,14 @@ Minties is a **Telegram-native financial super-app** designed to make DeFi acces
 - **Telegram Integration**: Built a native Mini App with contact syncing and bot interactions.
 - **Data Indexing**: Implemented Envio HyperSync for instant transaction history.
 - **UI/UX**: Developed a premium, dark-mode "Glassmorphism" UI responsive on mobile.
+- **Robustness**: Stabilized async transaction flows and build pipelines for production reliability.
+
+### **Resolved Technical Challenges**
+- **Async Transaction Safety**: Implemented on-chain polling to strictly verify Aave allowances, eliminating race conditions between `Approve` and `Supply` transactions.
+- **Smart Wallet Compatibility**: Added graceful fallback logic for wallets without ERC-7715 (Advanced Permissions) support, ensuring the app remains usable for all users.
+- **Bot Architecture**: Resolved "409 Conflict" errors by preventing concurrent polling instances, ensuring reliable bot operation across Development and Production.
+- **Build Pipeline**: Fixed complex TypeScript and dependency conflicts in the backend build process on Render.
+- **Atomic Goal Deletion**: Engineered a robust "Withdraw & Delete" flow that handles partial failures and state cleanup to prevent hydration mismatches.
 
 ### **Tech Stack**
 - **Next.js**: Frontend Framework
