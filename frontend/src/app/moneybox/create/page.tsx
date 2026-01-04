@@ -171,6 +171,9 @@ function CreateMoneyBoxForm() {
             } catch (e) { console.error(e); }
 
             show("success", "Money Box created successfully!");
+
+            // Allow state to settle
+            await new Promise(r => setTimeout(r, 500));
             router.push(`/`);
 
         } catch (error: any) {
