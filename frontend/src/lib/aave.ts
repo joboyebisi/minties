@@ -170,19 +170,37 @@ export async function supplyUsdc({
 
     console.log("Waiting for approval to be mined...", approveTx);
     await publicClient.waitForTransactionReceipt({ hash: approveTx });
-    console.log("Approval confirmed.");
+    console.log("Approval confirmed. Waiting for propagation...");
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Propagate
   } else {
     console.log("Allowance sufficient. Skipping approval.");
   }
 
   // 4. Supply to Aave
   console.log("Supplying to Aave contract...");
+
+  // Try to estimate gas, if it fails, fallback to manual limit
+  let gasLimit = BigInt(500000); // Default safe fallback
+  try {
+    const estimate = await publicClient.estimateContractGas({
+      address: AAVE_POOL_ADDRESS,
+      abi: poolAbi,
+      functionName: "supply",
+      args: [USDC_ADDRESS, parsed, accountAddress, 0],
+      account: walletClient.account,
+    });
+    gasLimit = (estimate * 120n) / 100n; // +20% buffer
+  } catch (e) {
+    console.warn("Gas estimation failed (likely revert), attempting with manual limit...", e);
+  }
+
   const supplyTx = await walletClient.writeContract({
     address: AAVE_POOL_ADDRESS,
     abi: poolAbi,
     functionName: "supply",
     args: [USDC_ADDRESS, parsed, accountAddress, 0],
     account: walletClient.account,
+    gas: gasLimit, // Explicitly set gas to bypass "gas limit too high" simulation error
   });
 
   return { approveTx, supplyTx };
