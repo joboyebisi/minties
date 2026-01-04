@@ -144,8 +144,7 @@ export async function supplyUsdc({
   }) as bigint;
 
   if (balance < parsed) {
-    console.warn(`Insufficient USDC Balance. You have ${Number(balance) / 10 ** decimals} USDC but tried to deposit ${amount} USDC. Proceeding in SIMULATION MODE.`);
-    // throw new Error(`Insufficient USDC Balance. You have ${Number(balance) / 10 ** decimals} USDC but tried to deposit ${amount} USDC.`);
+    throw new Error(`Insufficient USDC Balance. You have ${Number(balance) / 10 ** decimals} USDC but tried to deposit ${amount} USDC.`);
   }
 
   // 2. Check current allowance
@@ -160,42 +159,33 @@ export async function supplyUsdc({
 
   // 3. Approve if needed
   if (currentAllowance < parsed) {
-    // ... same approval logic ...
-    console.log(`Current allowance (${currentAllowance}) < Required (${parsed}). Approving... (SIMULATION MODE)`);
+    console.log(`Current allowance (${currentAllowance}) < Required (${parsed}). Approving...`);
+    approveTx = await walletClient.writeContract({
+      address: USDC_ADDRESS,
+      abi: erc20Abi,
+      functionName: "approve",
+      args: [AAVE_POOL_ADDRESS, parsed], // Use exact amount or max uint256
+      account: walletClient.account,
+    });
 
-    // SIMULATION MODE: Skip actual approval
-    // approveTx = await walletClient.writeContract({
-    //   address: USDC_ADDRESS,
-    //   abi: erc20Abi,
-    //   functionName: "approve",
-    //   args: [AAVE_POOL_ADDRESS, parsed], // Use exact amount or max uint256
-    //   account: walletClient.account,
-    // });
-
-    console.log("Simulating wait for approval...");
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Fake wait
-    // await publicClient.waitForTransactionReceipt({ hash: approveTx });
-    console.log("Approval confirmed (Simulated).");
+    console.log("Waiting for approval to be mined...", approveTx);
+    await publicClient.waitForTransactionReceipt({ hash: approveTx });
+    console.log("Approval confirmed.");
   } else {
     console.log("Allowance sufficient. Skipping approval.");
   }
 
   // 4. Supply to Aave
-  console.log("Supplying to Aave contract... (SIMULATION MODE)");
+  console.log("Supplying to Aave contract...");
+  const supplyTx = await walletClient.writeContract({
+    address: AAVE_POOL_ADDRESS,
+    abi: poolAbi,
+    functionName: "supply",
+    args: [USDC_ADDRESS, parsed, accountAddress, 0],
+    account: walletClient.account,
+  });
 
-  // SIMULATION MODE: Skip actual contract calls to prevent errors during demo
-  // const supplyTx = await walletClient.writeContract({
-  //   address: AAVE_POOL_ADDRESS,
-  //   abi: poolAbi,
-  //   functionName: "supply",
-  //   args: [USDC_ADDRESS, parsed, accountAddress, 0],
-  //   account: walletClient.account,
-  // });
-
-  const dummyHash = "0x" + "0".repeat(64) as Hash;
-  console.log("Aave Supply Simulated. Hash:", dummyHash);
-
-  return { approveTx: dummyHash, supplyTx: dummyHash };
+  return { approveTx, supplyTx };
 }
 
 export async function withdrawUsdc({
