@@ -34,13 +34,12 @@ Social saving with friends.
 This project utilizes **MetaMask Advanced Permissions** (ERC-7715) via the Smart Accounts Kit to enable fine-grained, recurring allowances for auto-savings and subscriptions.
 
 - **Requesting Permissions**:
-  - Library Definition: [`frontend/src/lib/metamask-permissions.ts`](frontend/src/lib/metamask-permissions.ts) (`requestRecurringTransferPermission`)
-  - Usage (MoneyBox): [`frontend/src/app/moneybox/create/page.tsx`](frontend/src/app/moneybox/create/page.tsx) (`setupMoneyBoxRecurringTransfer`)
-  - Usage (Recurring Gifts): [`frontend/src/app/gift/send/page.tsx`](frontend/src/app/gift/send/page.tsx) (`setupRecurringGift`)
+  - Code Usage: [metamask-permissions.ts#L46](https://github.com/joboyebisi/minties/blob/main/frontend/src/lib/metamask-permissions.ts#L46)
+  - Usage (Recurring Gifts): [setupRecurringGift](https://github.com/joboyebisi/minties/blob/main/frontend/src/lib/metamask-permissions.ts#L201)
   
 - **Redeeming Permissions**:
-  - Library Definition: [`frontend/src/lib/metamask-permissions.ts`](frontend/src/lib/metamask-permissions.ts) (`redeemPermissionAndTransfer`)
-  - Usage (Demo Trigger): [`frontend/src/app/moneybox/[id]/page.tsx`](frontend/src/app/moneybox/[id]/page.tsx)
+  - Code Usage: [metamask-permissions.ts#L101](https://github.com/joboyebisi/minties/blob/main/frontend/src/lib/metamask-permissions.ts#L101)
+  - Usage (Transfer Execution): [redeemPermissionAndTransfer](https://github.com/joboyebisi/minties/blob/main/frontend/src/lib/metamask-permissions.ts#L101)
 
 ## ⚡ Envio Usage
 We use **Envio HyperSync** to index Smart Account activity (deposits, gifts, claims) in real-time, allowing the UI to bypass slow standard RPC calls for transaction history.
