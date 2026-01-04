@@ -60,15 +60,15 @@ function CreateMoneyBoxForm() {
     }, []);
 
     // Calculate projections
-    const monthlyRate = (apy / 100) / 12; // Crude approximation for non-monthly
     const amount = parseFloat(formData.targetAmount) || 0;
     const durationVal = parseInt(formData.durationValue) || 1;
 
     // "Contribution per period"
     const contributionPerPeriod = amount / durationVal;
 
-    // Rough yield est
-    const projectedYield = formData.enableYield ? (amount * 0.05 * (durationVal / (formData.durationUnit === 'monthly' ? 12 : formData.durationUnit === 'weekly' ? 52 : 365))) : 0;
+    // Yield Calculation (using fetched APY)
+    const yearFraction = durationVal / (formData.durationUnit === 'monthly' ? 12 : formData.durationUnit === 'weekly' ? 52 : 365);
+    const projectedYield = formData.enableYield ? (amount * (apy / 100) * yearFraction) : 0;
     const totalProjected = amount + projectedYield;
 
     const handleSubmit = async (e: React.FormEvent) => {
