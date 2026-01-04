@@ -218,4 +218,3 @@ export async function withdrawUsdc({
 
   return tx as Hash;
 }
-
