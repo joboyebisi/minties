@@ -1,17 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAccount, useWalletClient } from "wagmi";
 import { Gift, Check, ArrowRight, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ToastProvider";
 import { ConnectButton } from "@/components/ConnectButton";
-
-// Mock function for demo if contract isn't fully ready, 
-// but we should aim to use real contract calls if possible.
 import { claimGift } from "@/lib/transactions";
 
-export default function ClaimGiftPage() {
+function ClaimGiftContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { address, isConnected } = useAccount();
@@ -30,13 +27,11 @@ export default function ClaimGiftPage() {
         }
 
         // Simulate fetching gift details
-        // In real app: call chain or backend to get amount
         const fetchGift = async () => {
             // For hackathon demo, we trust the link or fetch from backend
-            // Let's pretend we fetched it
             setTimeout(() => {
                 setGiftDetails({
-                    amount: "???", // We often can't see amount onchain easily without graph, using placeholder
+                    amount: "???",
                     sender: "A friend"
                 });
                 setStatus("ready");
@@ -60,12 +55,10 @@ export default function ClaimGiftPage() {
 
             setStatus("success");
             show("success", "Gift claimed successfully!");
-
-            // Notify backend (optional)
         } catch (error: any) {
             console.error("Claim failed", error);
             show("error", error.message || "Failed to claim gift");
-            setStatus("ready"); // Allow retry
+            setStatus("ready");
         } finally {
             setLoading(false);
         }
@@ -154,5 +147,17 @@ export default function ClaimGiftPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function ClaimGiftPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="animate-spin text-[#30f0a8]" size={40} />
+            </div>
+        }>
+            <ClaimGiftContent />
+        </Suspense>
     );
 }
