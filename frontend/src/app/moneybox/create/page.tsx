@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, useWalletClient, usePublicClient } from "wagmi";
 import { Calculator, Calendar, PiggyBank, Target, ArrowRight, ArrowLeft, Wallet, TrendingUp, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ToastProvider";
 import { PermissionGuard } from "@/components/PermissionGuard";
@@ -32,6 +32,7 @@ function CreateMoneyBoxForm() {
     const router = useRouter();
     const { address } = useAccount();
     const { data: walletClient } = useWalletClient();
+    const publicClient = usePublicClient();
     const { show } = useToast();
 
     const [formData, setFormData] = useState({
@@ -67,7 +68,7 @@ function CreateMoneyBoxForm() {
             show("error", "Wallet not connected");
             return;
         }
-        if (!walletClient) {
+        if (!walletClient || !publicClient) {
             show("error", "Wallet Client not ready. Please refresh or reconnect.");
             return;
         }
@@ -81,6 +82,7 @@ function CreateMoneyBoxForm() {
                     const initialDeposit = contributionPerPeriod;
                     await supplyUsdc({
                         walletClient: walletClient,
+                        publicClient: publicClient,
                         amount: initialDeposit,
                     });
                     show("success", `Deposited ${initialDeposit.toFixed(2)} USDC to Aave!`);
