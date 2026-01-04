@@ -154,7 +154,7 @@ export async function saveGift(gift: any) {
 
 export async function getUserGifts(address: string) {
   if (!supabase) return [];
-  const { data } = await supabase.from('gifts').select('*').eq('sender_id', address); // Using sender_id based on schema likely, or just 'sender' if loose. Schema in 1463 says 'sender_id'.
+  const { data } = await supabase.from('gifts').select('*').eq('sender', address);
   return data || [];
 }
 

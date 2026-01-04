@@ -187,13 +187,13 @@ export function UserDashboard() {
                                         <div className="bg-[rgba(48,240,168,0.1)] p-2 rounded-full mb-2 w-fit">
                                             <Target size={18} className="text-[#30f0a8]" />
                                         </div>
-                                        <span className="text-xs text-[#8da196] font-mono">{box.progress.toFixed(0)}%</span>
+                                        <span className="text-xs text-[#8da196] font-mono">{(box.progress || 0).toFixed(0)}%</span>
                                     </div>
-                                    <span className="font-semibold text-[#e8fdf4] block mb-1 truncate">{box.title}</span>
-                                    <p className="text-xs text-[#8da196] mb-3">Target: {box.target.toLocaleString()} USDC</p>
+                                    <span className="font-semibold text-[#e8fdf4] block mb-1 truncate">{box.title || "Untitled Goal"}</span>
+                                    <p className="text-xs text-[#8da196] mb-3">Target: {(box.target || 0).toLocaleString()} USDC</p>
                                 </div>
                                 <div className="w-full h-2 bg-[rgba(48,240,168,0.1)] rounded-full overflow-hidden">
-                                    <div className="h-full bg-[#30f0a8]" style={{ width: `${box.progress}%` }} />
+                                    <div className="h-full bg-[#30f0a8]" style={{ width: `${box.progress || 0}%` }} />
                                 </div>
                             </Link>
                         ))
