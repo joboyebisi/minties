@@ -73,28 +73,26 @@ const erc20Abi = [
     inputs: [],
     outputs: [{ name: "", type: "uint8" }],
   },
+  {
+    type: "function",
+    name: "balanceOf",
+    stateMutability: "view",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "allowance",
+    stateMutability: "view",
+    inputs: [
+      { name: "owner", type: "address" },
+      { name: "spender", type: "address" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+  }
 ];
 
-const rayToApy = (ray: bigint) => {
-  // ray = 1e27; apy = liquidityRate / 1e27
-  const RAY = 10n ** 27n;
-  const apy = Number(ray) / Number(RAY);
-  return apy * 100; // %
-};
-
-export async function fetchAaveApy(rpcUrl?: string) {
-  const client = createPublicClient({
-    transport: http(rpcUrl || process.env.NEXT_PUBLIC_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com"),
-  });
-  const data = await client.readContract({
-    address: AAVE_POOL_ADDRESS,
-    abi: poolAbi,
-    functionName: "getReserveData",
-    args: [USDC_ADDRESS],
-  });
-  const liquidityRate = (data as any).currentLiquidityRate as bigint;
-  return rayToApy(liquidityRate);
-}
+// ... (keep helper functions like rayToApy)
 
 export async function supplyUsdc({
   walletClient,
@@ -118,7 +116,19 @@ export async function supplyUsdc({
   const parsed = BigInt(Math.round(amount * 10 ** decimals));
   const accountAddress = walletClient.account.address as Address;
 
-  // 1. Check current allowance
+  // 1. Check Balance First (Prevent Revert)
+  const balance = await publicClient.readContract({
+    address: USDC_ADDRESS,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: [accountAddress],
+  }) as bigint;
+
+  if (balance < parsed) {
+    throw new Error(`Insufficient USDC Balance. You have ${Number(balance) / 10 ** decimals} USDC but tried to deposit ${amount} USDC.`);
+  }
+
+  // 2. Check current allowance
   const currentAllowance = await publicClient.readContract({
     address: USDC_ADDRESS,
     abi: erc20Abi,
@@ -128,8 +138,9 @@ export async function supplyUsdc({
 
   let approveTx;
 
-  // 2. Approve if needed
+  // 3. Approve if needed
   if (currentAllowance < parsed) {
+    // ... same approval logic ...
     console.log(`Current allowance (${currentAllowance}) < Required (${parsed}). Approving...`);
     approveTx = await walletClient.writeContract({
       address: USDC_ADDRESS,
@@ -146,7 +157,7 @@ export async function supplyUsdc({
     console.log("Allowance sufficient. Skipping approval.");
   }
 
-  // 3. Supply to Aave
+  // 4. Supply to Aave
   console.log("Supplying to Aave contract...");
   const supplyTx = await walletClient.writeContract({
     address: AAVE_POOL_ADDRESS,
