@@ -207,14 +207,25 @@ export function UserDashboard() {
                                             {/* We can add Withdraw logic later, for now just Delete which is the blocker */}
                                             <li>
                                                 <button
-                                                    onClick={(e) => {
+                                                    onClick={async (e) => {
                                                         e.preventDefault(); // Prevent navigation
                                                         if (confirm(`Delete "${box.title}"? This will remove the goal.`)) {
-                                                            import("@/lib/supabase").then(({ deleteMoneyBox }) => deleteMoneyBox(box.id));
-                                                            import("@/lib/local-db").then(({ deleteItem }) => deleteItem("moneyBoxes", box.id));
+                                                            try {
+                                                                const { deleteMoneyBox } = await import("@/lib/supabase");
+                                                                await deleteMoneyBox(box.id);
+
+                                                                const { deleteItem } = await import("@/lib/local-db");
+                                                                deleteItem("moneyBoxes", box.id);
+
+                                                                // Force explicit reload event just in case
+                                                                window.dispatchEvent(new Event("minties_data_updated"));
+                                                            } catch (err) {
+                                                                console.error("Delete failed", err);
+                                                                alert("Failed to delete goal. Please try again.");
+                                                            }
                                                         }
                                                     }}
-                                                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20 text-xs"
+                                                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20 text-xs w-full text-left py-1 px-2 rounded"
                                                 >
                                                     Delete
                                                 </button>

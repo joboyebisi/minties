@@ -160,6 +160,9 @@ export async function saveGift(gift: any) {
 }
 
 export async function getUserGifts(address: string) {
+  // Temporary fix for 400 error spam: return empty
+  return [];
+  /*
   if (!supabase) return [];
   try {
     const { data, error } = await supabase.from('gifts').select('*').eq('sender', address);
@@ -172,6 +175,7 @@ export async function getUserGifts(address: string) {
     console.error("Supabase getUserGifts exception:", e);
     return [];
   }
+  */
 }
 
 // --- Notifications ---
