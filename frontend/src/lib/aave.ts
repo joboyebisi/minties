@@ -92,7 +92,26 @@ const erc20Abi = [
   }
 ];
 
-// ... (keep helper functions like rayToApy)
+const rayToApy = (ray: bigint) => {
+  // ray = 1e27; apy = liquidityRate / 1e27
+  const RAY = 10n ** 27n;
+  const apy = Number(ray) / Number(RAY);
+  return apy * 100; // %
+};
+
+export async function fetchAaveApy(rpcUrl?: string) {
+  const client = createPublicClient({
+    transport: http(rpcUrl || process.env.NEXT_PUBLIC_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com"),
+  });
+  const data = await client.readContract({
+    address: AAVE_POOL_ADDRESS,
+    abi: poolAbi,
+    functionName: "getReserveData",
+    args: [USDC_ADDRESS],
+  });
+  const liquidityRate = (data as any).currentLiquidityRate as bigint;
+  return rayToApy(liquidityRate);
+}
 
 export async function supplyUsdc({
   walletClient,
