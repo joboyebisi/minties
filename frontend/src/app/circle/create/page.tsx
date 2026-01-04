@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAccount, useWalletClient } from "wagmi";
 import { PiggyBank, Users, Vault, CheckCircle2, Copy, Share2, QrCode, ArrowLeft, ArrowRight, Repeat } from "lucide-react";
@@ -33,6 +33,20 @@ export default function CreateSavingsCirclePage() {
     const [currentStep, setCurrentStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const [circleId, setCircleId] = useState<string | null>(null);
+
+    // Fetch live Aave APY
+    useEffect(() => {
+        async function loadApy() {
+            try {
+                const { fetchAaveApy } = await import("@/lib/aave");
+                const rate = await fetchAaveApy();
+                setFormData(prev => ({ ...prev, yieldPercentage: rate.toFixed(1) }));
+            } catch (e) {
+                console.error("Failed to load APY", e);
+            }
+        }
+        loadApy();
+    }, []);
 
     const updateFormData = (data: Partial<typeof formData>) => {
         setFormData((prev) => ({ ...prev, ...data }));
