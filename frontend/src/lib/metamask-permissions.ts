@@ -72,7 +72,7 @@ export async function requestRecurringTransferPermission({
   try {
     // Use direct RPC call to bypass library wrapper issues
     const grantedPermissions = await walletClient.request({
-      method: 'wallet_requestExecutionPermissions',
+      method: 'wallet_requestExecutionPermissions' as any,
       params: [{
         chainId: chainStr,
         expiry,
