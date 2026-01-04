@@ -128,6 +128,8 @@ export default function MoneyBoxDashboardPage() {
         setRedeeming(true);
         try {
             // 1. Withdraw from Aave if needed
+            console.log("Checking withdrawal amount:", goal.currentAmount);
+
             if (goal.currentAmount > 0) {
                 if (!walletClient) {
                     throw new Error("Wallet not connected for withdrawal");
