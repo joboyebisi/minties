@@ -65,30 +65,35 @@ export async function requestRecurringTransferPermission({
   }
 
   const chainId = sepolia.id;
+  const chainStr = `0x${chainId.toString(16)}`; // Hex string for RPC
   // USDC has 6 decimals
   const amountWei = parseUnits(periodAmount, 6);
 
   try {
-    const grantedPermissions = await walletClient.requestExecutionPermissions([{
-      chainId,
-      expiry,
-      signer: {
-        type: 'account',
-        data: {
-          address: sessionAccountAddress,
+    // Use direct RPC call to bypass library wrapper issues
+    const grantedPermissions = await walletClient.request({
+      method: 'wallet_requestExecutionPermissions',
+      params: [{
+        chainId: chainStr,
+        expiry,
+        signer: {
+          type: 'account',
+          data: {
+            address: sessionAccountAddress,
+          },
         },
-      },
-      permission: {
-        type: 'erc20-token-periodic',
-        data: {
-          tokenAddress,
-          periodAmount: amountWei,
-          periodDuration,
-          justification: justification || `Recurring transfer of ${periodAmount} USDC`,
-        },
-      },
-      isAdjustmentAllowed: true,
-    }]);
+        permissions: [{
+          type: 'erc20-token-periodic',
+          data: {
+            tokenAddress,
+            periodAmount: amountWei.toString(), // Ensure string for RPC
+            periodDuration,
+            justification: justification || `Recurring transfer of ${periodAmount} USDC`,
+          },
+        }],
+        isAdjustmentAllowed: true,
+      }]
+    }) as any;
 
     return grantedPermissions[0];
   } catch (error) {
