@@ -173,6 +173,11 @@ function CreateMoneyBoxForm() {
                 });
             } catch (e) { console.error(e); }
 
+            // Force dashboard refresh
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new Event("minties_data_updated"));
+            }
+
             show("success", "Money Box created successfully!");
 
             // Allow state to settle
