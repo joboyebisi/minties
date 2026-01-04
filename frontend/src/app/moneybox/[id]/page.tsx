@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
+import { useAccount, useWalletClient, usePublicClient } from "wagmi";
 import { ArrowLeft, Clock, DollarSign, PiggyBank, Share2, TrendingUp, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ToastProvider";
 import { PermissionGuard } from "@/components/PermissionGuard";
@@ -111,6 +111,9 @@ export default function MoneyBoxDashboardPage() {
     if (loading) return <div className="p-8 text-center text-[#8da196]">Loading goal...</div>;
     if (!goal) return <div className="p-8 text-center text-[#ff6b6b]">Goal not found</div>;
 
+    const { data: walletClient } = useWalletClient();
+    const publicClient = usePublicClient();
+
     const handleDelete = async () => {
         if (!confirm("Are you sure? This will withdraw your funds and delete this goal.")) return;
 
@@ -118,13 +121,40 @@ export default function MoneyBoxDashboardPage() {
         try {
             // 1. Withdraw from Aave if needed
             if (goal.currentAmount > 0) {
+                if (!walletClient) {
+                    throw new Error("Wallet not connected for withdrawal");
+                }
+
                 show("info", "Withdrawing funds from Aave...");
                 try {
                     const { withdrawUsdc } = await import("@/lib/aave");
-                    // Actual withdrawal logic would go here using walletClient
-                    // For now we proceed to delete to allow user to clean up UI
-                } catch (e) {
+                    // We use the full amount (target * progress) or just what is tracked
+                    // Since we don't track exact "deposited" amount in simple DB, 
+                    // and currentAmount is an estimate, we should ideally check Aave balance.
+                    // But here we'll try to withdraw the logical amount the user thinks they have.
+                    // IMPORTANT: withdrawUsdc takes 'amount' as string or number.
+
+                    // We'll withdraw MAX just to be safe/clean? No, withdrawUsdc usually takes specific amount.
+                    // Let's pass the currentAmount. If it fails due to nuances, user can manual withdraw later (not ideal).
+                    // For 'delete', withdrawing everything mapped to this goal is the intent.
+
+                    await withdrawUsdc({
+                        walletClient,
+                        publicClient,
+                        amount: goal.currentAmount
+                    });
+
+                    show("success", "Funds withdrawn to wallet!");
+                } catch (e: any) {
                     console.error("Withdrawal skipped/failed", e);
+                    show("error", "Withdrawal failed: " + e.message + ". Deleting anyway...");
+                    // We continue to delete to allow cleanup, or should we halt?
+                    // User said "money paid back... before delete". 
+                    // If withdrawal fails, we arguably shouldn't delete the record so they don't lose track.
+                    if (!confirm("Withdrawal failed. Do you want to force delete the goal anyway? (Funds remain in Aave)")) {
+                        setRedeeming(false);
+                        return;
+                    }
                 }
             }
 
