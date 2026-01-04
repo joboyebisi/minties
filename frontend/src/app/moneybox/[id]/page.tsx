@@ -123,14 +123,15 @@ export default function MoneyBoxDashboardPage() {
     const publicClient = usePublicClient();
 
     const handleDelete = async () => {
-        if (!confirm("Are you sure? This will withdraw your funds and delete this goal.")) return;
+        if (!confirm("Are you sure? This will withdraw your funds (if any) and delete this goal.")) return;
 
         setRedeeming(true);
         try {
             // 1. Withdraw from Aave if needed
-            console.log("Checking withdrawal amount:", goal.currentAmount);
+            const amountToWithdraw = Number(goal.currentAmount || 0);
+            console.log("Checking withdrawal amount:", amountToWithdraw);
 
-            if (goal.currentAmount > 0) {
+            if (amountToWithdraw > 0) {
                 if (!walletClient) {
                     throw new Error("Wallet not connected for withdrawal");
                 }
@@ -138,47 +139,41 @@ export default function MoneyBoxDashboardPage() {
                 show("info", "Withdrawing funds from Aave...");
                 try {
                     const { withdrawUsdc } = await import("@/lib/aave");
-                    // We use the full amount (target * progress) or just what is tracked
-                    // Since we don't track exact "deposited" amount in simple DB, 
-                    // and currentAmount is an estimate, we should ideally check Aave balance.
-                    // But here we'll try to withdraw the logical amount the user thinks they have.
-                    // IMPORTANT: withdrawUsdc takes 'amount' as string or number.
-
-                    // We'll withdraw MAX just to be safe/clean? No, withdrawUsdc usually takes specific amount.
-                    // Let's pass the currentAmount. If it fails due to nuances, user can manual withdraw later (not ideal).
-                    // For 'delete', withdrawing everything mapped to this goal is the intent.
-
                     await withdrawUsdc({
                         walletClient,
-                        amount: goal.currentAmount
+                        amount: amountToWithdraw
                     });
-
                     show("success", "Funds withdrawn to wallet!");
                 } catch (e: any) {
                     console.error("Withdrawal skipped/failed", e);
-                    show("error", "Withdrawal failed: " + e.message + ". Deleting anyway...");
-                    // We continue to delete to allow cleanup, or should we halt?
-                    // User said "money paid back... before delete". 
-                    // If withdrawal fails, we arguably shouldn't delete the record so they don't lose track.
-                    if (!confirm("Withdrawal failed. Do you want to force delete the goal anyway? (Funds remain in Aave)")) {
+                    // Critical change: If withdrawal fails, we ask the user IF they want to proceed.
+                    // If they say YES, we delete. If NO, we stop.
+                    if (!confirm(`Withdrawal failed (${e.message}). Do you want to force delete the goal anyway? Funds will remain in Aave.`)) {
                         setRedeeming(false);
                         return;
                     }
                 }
             }
 
-            // 2. Delete from DB
-            const { deleteMoneyBox } = await import("@/lib/supabase");
-            await deleteMoneyBox(id);
+            // 2. Delete from DB (Supabase)
+            try {
+                const { deleteMoneyBox } = await import("@/lib/supabase");
+                await deleteMoneyBox(id);
+            } catch (e) { console.error("DB delete failed", e); }
 
-            // 3. Delete from Local
+            // 3. Delete from Local (Always do this to clear UI)
             try {
                 const { deleteItem } = await import("@/lib/local-db");
                 deleteItem("moneyBoxes", id);
-            } catch (e) { }
+                // Dispatch event to update dashboard immediately if we navigate back
+                if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new Event("minties_data_updated"));
+                }
+            } catch (e) { console.error("Local delete failed", e); }
 
             show("success", "Goal deleted!");
             router.push("/");
+
         } catch (e: any) {
             show("error", "Failed to delete: " + e.message);
         } finally {
