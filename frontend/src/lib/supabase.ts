@@ -132,6 +132,13 @@ export async function getUserMoneyBoxes(address: string) {
   return data || [];
 }
 
+export async function deleteMoneyBox(id: string) {
+  if (!supabase) return null;
+  const { error } = await supabase.from('money_boxes').delete().eq('id', id);
+  if (error) console.error("Error deleting money box:", error);
+  return !error;
+}
+
 export async function saveCircle(circle: any) {
   if (!supabase) return null;
   const { error } = await supabase.from('savings_circles').insert(circle);

@@ -138,7 +138,7 @@ function CreateMoneyBoxForm() {
                 owner: address,
                 title: formData.title,
                 target_amount: parseFloat(formData.targetAmount),
-                progress: formData.enableYield && amount > 0 ? (amount / parseFloat(formData.targetAmount) * 100) : 0,
+                progress: formData.enableYield && amount > 0 ? ((contributionPerPeriod / parseFloat(formData.targetAmount)) * 100) : 0,
             };
 
             // 1. Save to Supabase (Primary)
