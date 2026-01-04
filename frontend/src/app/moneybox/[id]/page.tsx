@@ -62,16 +62,22 @@ export default function MoneyBoxDashboardPage() {
 
             if (found) {
                 // Augment with logical defaults if missing
+                const target = Number(found.target_amount || found.target || 0);
+                const progressVal = Number(found.progress || 0);
+                const current = target > 0
+                    ? target * (progressVal / 100)
+                    : 0; // Avoid NaN if target is 0
+
                 setGoal({
                     ...found,
-                    title: found.title,
-                    targetAmount: found.target_amount || found.target || 0, // Handle DB vs Local casing
-                    currentAmount: (found.target_amount || found.target || 0) * ((found.progress || 0) / 100), // Estimate amount if not stored explicitly
-                    progress: found.progress || 0,
-                    autoSave: !!found.recurring_amount, // Use existence of amount to determine auto-save
-                    monthlyAmount: found.recurring_amount || 0, // Map to display field
+                    title: found.title || "Untitled Goal",
+                    targetAmount: isNaN(target) ? 0 : target,
+                    currentAmount: isNaN(current) ? 0 : current,
+                    progress: isNaN(progressVal) ? 0 : progressVal,
+                    autoSave: !!found.recurring_amount,
+                    monthlyAmount: Number(found.recurring_amount || 0),
                     frequency: found.contribution_frequency || 'monthly',
-                    yieldEarned: 0 // Fetch real yield later if possible
+                    yieldEarned: 0
                 });
             } else {
                 // Fallback to mock ONLY if truly not found (or if ID is 'new')
@@ -239,7 +245,7 @@ export default function MoneyBoxDashboardPage() {
                         <div>
                             <h3 className="font-semibold text-[#e8fdf4]">Auto-Save Active</h3>
                             <p className="text-sm text-[#8da196]">
-                                Next pull: ${goal.monthlyAmount.toFixed(2)} {goal.frequency === 'daily' ? 'tomorrow' : `on ${new Date(Date.now() + (goal.frequency === 'weekly' ? 604800000 : 2592000000)).toLocaleDateString()}`}
+                                Next pull: ${(goal.monthlyAmount || 0).toFixed(2)} {goal.frequency === 'daily' ? 'tomorrow' : `on ${new Date(Date.now() + (goal.frequency === 'weekly' ? 604800000 : 2592000000)).toLocaleDateString()}`}
                             </p>
                         </div>
                     </div>

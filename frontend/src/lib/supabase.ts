@@ -161,8 +161,17 @@ export async function saveGift(gift: any) {
 
 export async function getUserGifts(address: string) {
   if (!supabase) return [];
-  const { data } = await supabase.from('gifts').select('*').eq('sender', address);
-  return data || [];
+  try {
+    const { data, error } = await supabase.from('gifts').select('*').eq('sender', address);
+    if (error) {
+      console.error("Supabase getUserGifts error:", error);
+      return [];
+    }
+    return data || [];
+  } catch (e) {
+    console.error("Supabase getUserGifts exception:", e);
+    return [];
+  }
 }
 
 // --- Notifications ---
