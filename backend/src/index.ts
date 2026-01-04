@@ -34,9 +34,7 @@ if (BACKEND_URL) {
   });
 } else {
   console.log("💻 No BACKEND_URL found, starting in POLLING mode (Local Dev)");
-  bot.startPolling({
-    params: { timeout: 10 }
-  });
+  bot.startPolling();
 }
 
 setupTelegramBot(bot);
