@@ -200,7 +200,7 @@ export async function supplyUsdc({
   console.log("Supplying to Aave contract...");
 
   // Try to estimate gas, if it fails, fallback to manual limit
-  let gasLimit = BigInt(500000); // Default safe fallback
+  let gasLimit = BigInt(750000); // Increased safety fallback
   try {
     const estimate = await publicClient.estimateContractGas({
       address: AAVE_POOL_ADDRESS,
@@ -209,9 +209,11 @@ export async function supplyUsdc({
       args: [USDC_ADDRESS, parsed, accountAddress, 0],
       account: walletClient.account,
     });
+    console.log("Gas estimation succeeded:", estimate.toString());
     gasLimit = (estimate * 120n) / 100n; // +20% buffer
-  } catch (e) {
-    console.warn("Gas estimation failed (likely revert), attempting with manual limit...", e);
+  } catch (e: any) {
+    console.warn("Gas estimation failed (likely revert). Using manual limit.", e.message || e);
+    // Log the specific revert reason if available
   }
 
   const supplyTx = await walletClient.writeContract({
@@ -220,7 +222,7 @@ export async function supplyUsdc({
     functionName: "supply",
     args: [USDC_ADDRESS, parsed, accountAddress, 0],
     account: walletClient.account,
-    gas: gasLimit, // Explicitly set gas to bypass "gas limit too high" simulation error
+    gas: gasLimit,
   });
 
   return { approveTx, supplyTx };
