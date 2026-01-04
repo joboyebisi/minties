@@ -26,33 +26,51 @@ const useUserItems = (address?: string) => {
 
     useEffect(() => {
         const loadItems = async () => {
-            // 1. Try Loading from Supabase
+            let moneyBoxes: any[] = [];
+            let gifts: any[] = [];
+            let circles: any[] = [];
+
+            // 1. Try Local Storage (Fast, always available for demo)
             try {
-                // Determine address to fetch for (requires importing helper)
-                // We'll dynamic import to avoid issues if helpers aren't perfectly typed yet
-                const { getUserMoneyBoxes, getCircles, getUserGifts } = await import("@/lib/supabase");
-                // const { address: currentAddress } = await import("@/lib/smart-account"); // Removed problematic line
-
-                if (address) {
-                    const boxes = await getUserMoneyBoxes(address);
-                    // const circles = await getCircles(); // Removed unused
-                    const gifts = await getUserGifts(address);
-                    setItems(prev => ({ ...prev, moneyBoxes: boxes as any, gifts: gifts as any }));
+                const { getAllItems } = await import("@/lib/local-db");
+                const localData = getAllItems();
+                if (localData) {
+                    moneyBoxes = localData.moneyBoxes || [];
+                    gifts = localData.gifts || [];
+                    circles = localData.circles || [];
                 }
+            } catch (e) { console.error("Local fetch error", e); }
 
-                // We can't easily access 'address' from hook here inside useEffect if not passed to helper
-                // But we can use the 'items' state setter.
-            } catch (e) { console.error(e); }
+            // 2. Try Supabase (Async, merge with local if unique)
+            if (address) {
+                try {
+                    const { getUserMoneyBoxes, getUserGifts } = await import("@/lib/supabase");
+                    const dbBoxes = await getUserMoneyBoxes(address);
+                    const dbGifts = await getUserGifts(address);
 
-            // Actual Implementation:
-            let dbData = { moneyBoxes: [], circles: [], gifts: [] };
+                    // Simple merge: prefer DB but keep local additions not yet synced? 
+                    // For now, just concat and dedupe by ID would be best, or just replace if DB has data.
+                    // Given the goal: "See the goals I just created" (which are saved to both), 
+                    // we'll prioritize DB if it returns data, otherwise fallback to Local.
+                    // Actually, let's just use what we have.
+                    if (dbBoxes && dbBoxes.length > 0) moneyBoxes = dbBoxes;
+                    if (dbGifts && dbGifts.length > 0) gifts = dbGifts;
 
-            // We need 'address' for queries. It's available in the component scope, but this hook is outside.
-            // Refactoring: move the fetching logic INSIDE the component or pass address to the hook.
+                } catch (e) { console.error("Supabase fetch error", e); }
+            }
+
+            setItems({
+                moneyBoxes: moneyBoxes as MoneyBox[],
+                circles: circles as Circle[],
+                gifts: gifts as GiftItem[]
+            });
         };
-        // ...
-    }, []);
 
+        loadItems();
+        // Listen for local updates (e.g. just created a goal)
+        window.addEventListener("minties_data_updated", loadItems);
+        return () => window.removeEventListener("minties_data_updated", loadItems);
+    }, [address]);
 
     return items;
 };
@@ -141,10 +159,11 @@ export function UserDashboard() {
                     </Link>
                 </div>
 
-                <div className="grid gap-3">
+                {/* Horizontal Scroll / Carousel */}
+                <div className="flex gap-4 overflow-x-auto pb-4 snap-x trigger-scroll-hint -mx-4 px-4 sm:mx-0 sm:px-0">
                     {/* Onboarding: Default Goal if list is empty */}
                     {moneyBoxes.length === 0 ? (
-                        <div className="card p-4 border border-[#30f0a8] bg-[rgba(48,240,168,0.03)] relative overflow-hidden group transition-all">
+                        <div className="card min-w-[260px] p-4 border border-[#30f0a8] bg-[rgba(48,240,168,0.03)] relative overflow-hidden group transition-all snap-center">
                             <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
                                 <Target size={64} />
                             </div>
@@ -162,10 +181,16 @@ export function UserDashboard() {
                         </div>
                     ) : (
                         moneyBoxes.map(box => (
-                            <Link href={`/moneybox/${box.id}`} key={box.id} className="card p-4 hover:bg-[rgba(48,240,168,0.05)] transition border border-[#1e2a24]">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="font-semibold text-[#e8fdf4]">{box.title}</span>
-                                    <span className="text-xs text-[#8da196]">{box.progress}%</span>
+                            <Link href={`/moneybox/${box.id}`} key={box.id} className="card min-w-[240px] p-4 hover:bg-[rgba(48,240,168,0.05)] transition border border-[#1e2a24] snap-center flex flex-col justify-between">
+                                <div>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="bg-[rgba(48,240,168,0.1)] p-2 rounded-full mb-2 w-fit">
+                                            <Target size={18} className="text-[#30f0a8]" />
+                                        </div>
+                                        <span className="text-xs text-[#8da196] font-mono">{box.progress.toFixed(0)}%</span>
+                                    </div>
+                                    <span className="font-semibold text-[#e8fdf4] block mb-1 truncate">{box.title}</span>
+                                    <p className="text-xs text-[#8da196] mb-3">Target: {box.target.toLocaleString()} USDC</p>
                                 </div>
                                 <div className="w-full h-2 bg-[rgba(48,240,168,0.1)] rounded-full overflow-hidden">
                                     <div className="h-full bg-[#30f0a8]" style={{ width: `${box.progress}%` }} />

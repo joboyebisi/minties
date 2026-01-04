@@ -17,3 +17,13 @@ export function saveItem(type: 'moneyBoxes' | 'circles' | 'gifts', item: any) {
         console.error("Failed to save item", e);
     }
 }
+
+export function getAllItems() {
+    if (typeof window === 'undefined') return { moneyBoxes: [], circles: [], gifts: [] };
+    try {
+        const stored = localStorage.getItem("minties_data");
+        return stored ? JSON.parse(stored) : { moneyBoxes: [], circles: [], gifts: [] };
+    } catch (e) {
+        return { moneyBoxes: [], circles: [], gifts: [] };
+    }
+}
