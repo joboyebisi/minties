@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAccount, useWalletClient, usePublicClient } from "wagmi";
 import { Calculator, Calendar, PiggyBank, Target, ArrowRight, ArrowLeft, Wallet, TrendingUp, AlertCircle } from "lucide-react";
@@ -46,6 +46,18 @@ function CreateMoneyBoxForm() {
 
     const [loading, setLoading] = useState(false);
     const [apy, setApy] = useState<number>(5.0); // Default fallback
+
+    useEffect(() => {
+        async function loadApy() {
+            try {
+                const rate = await fetchAaveApy();
+                setApy(rate);
+            } catch (error) {
+                console.error("Failed to fetch APY", error);
+            }
+        }
+        loadApy();
+    }, []);
 
     // Calculate projections
     const monthlyRate = (apy / 100) / 12; // Crude approximation for non-monthly
