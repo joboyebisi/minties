@@ -8,7 +8,8 @@
 A **Telegram Mini App** for crypto savings, gifts, and yield earning. Built with **MetaMask Smart Accounts** for a seamless, gasless experience.
 
 
-<img width="2844" height="1618" alt="Minties Main Dashboard" src="https://github.com/user-attachments/assets/b318789a-10ad-46d0-b00d-2e4fa4f39d28" />
+<img width="2750" height="1666" alt="Minties Readme" src="https://github.com/user-attachments/assets/5a44699d-b8dd-47ca-8ff4-5f35f11f5617" />
+
 
 ## 🚀 Features
 
