@@ -176,6 +176,8 @@ export default function MoneyBoxDashboardPage() {
             // Give time for state updates to propagate before navigating
             await new Promise(r => setTimeout(r, 500));
             router.push("/");
+
+        } catch (e: any) {
             show("error", "Failed to delete: " + e.message);
         } finally {
             setRedeeming(false);
