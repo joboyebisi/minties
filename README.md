@@ -58,6 +58,20 @@ We use **Envio HyperSync** to index Smart Account activity (deposits, gifts, cla
 - **DeFi**: Aave V3 Protocol
 - **Indexing**: Envio HyperSync (Real-time data) / Hybrid Local Storage Fallback
 
+## 💡 Hackathon Implementation Feedback
+
+### 🦊 MetaMask Smart Accounts (ERC-7715)
+Our experience building with the Smart Accounts Kit was largely positive but highlighted some "bleeding edge" challenges:
+-   **The Good**: The concept of "delegated permissions" for recurring payments is powerful. Once set up, it truly enables a "Web2-like" subscription experience on-chain.
+-   **The Challenge**: Browser wallet support for ERC-7715 is strict. We encountered generic errors when the wallet wasn't configured correctly.
+-   **User Note**: Users often need to explicitly enable **"Experimental Features"** or **"Advanced Privacy"** settings in MetaMask for `wallet_requestExecutionPermissions` to work reliably. Without this, the method may be undefined.
+-   **Our Solution**: We implemented a "Graceful Fallback" pattern—detecting if the permission logic fails and creating a standard one-time transaction instead.
+
+### ⚡ Envio HyperSync
+-   **Speed**: HyperSync decreased our data fetching time significantly compared to standard RPC calls.
+-   **The Challenge**: We faced initial app crashes due to **Strict Type Handling** and **Client/Server Hydration Mismatches**. Unlike standard JSON-RPC which is forgiving, HyperSync's strict schema means any mismatch between the expected indexer schema and the frontend types can crash the page.
+-   **Verdict**: Powerful, but requires robust error boundaries and strict type generation to prevent UI crashes.
+
 ## 🔗 Contract Addresses (Sepolia)
 
 | Contract | Address |
