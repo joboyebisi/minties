@@ -31,11 +31,33 @@ export default function SendGiftPage() {
     const [shareLink, setShareLink] = useState("");
 
     const handleCreateGift = async () => {
-        if (!walletClient || !address) {
+        if (!address) {
             show("error", "Wallet not connected");
             return;
         }
+
+        // Fallback: Get valid wallet client if hook is slow
+        let activeWalletClient = walletClient;
+        if (!activeWalletClient) {
+            try {
+                console.log("Hook client missing, creating manual client...");
+                // We reuse the permissions helper which creates a client from window.ethereum
+                const { createWalletClientWithPermissions } = await import("@/lib/metamask-permissions");
+                activeWalletClient = createWalletClientWithPermissions() as any;
+            } catch (e) {
+                console.error("Failed to create fallback client", e);
+            }
+        }
+
+        if (!activeWalletClient) {
+            show("error", "Could not access wallet. Please refresh.");
+            return;
+        }
+
         setLoading(true);
+
+        // Local State for this transaction (mutable)
+        let isRecurringAuthorized = formData.recurring;
 
         try {
             // 1. If recurring, request permission
@@ -53,9 +75,9 @@ export default function SendGiftPage() {
                     show("success", "Recurring gift permission granted!");
                 } catch (err: any) {
                     console.error("Permission request failed", err);
-                    show("error", "Permission denied or failed. Check console.");
-                    setLoading(false);
-                    return; // Stop flow
+                    // Graceful downgrade
+                    isRecurringAuthorized = false;
+                    show("info", "Recurring gifts not supported by this wallet. Sending as one-time gift.");
                 }
             }
 
@@ -68,11 +90,11 @@ export default function SendGiftPage() {
             const id = keccak256(giftIdBytes) as `0x${string}`;
 
             const { hash } = await createGift({
-                walletClient,
+                walletClient: activeWalletClient,
                 giftId: id,
                 amount: formData.amount,
-                giftType: formData.recurring ? 2 : 0, // 0=Single, 2=Scheduled/Recurring logic
-                maxClaims: formData.recurring ? parseInt(formData.duration) : 1,
+                giftType: isRecurringAuthorized ? 2 : 0, // 0=Single, 2=Scheduled/Recurring logic
+                maxClaims: isRecurringAuthorized ? parseInt(formData.duration) : 1,
             });
             console.log("Gift created on-chain:", hash);
 
