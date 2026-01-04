@@ -181,21 +181,48 @@ export function UserDashboard() {
                         </div>
                     ) : (
                         moneyBoxes.map(box => (
-                            <Link href={`/moneybox/${box.id}`} key={box.id} className="card min-w-[240px] p-4 hover:bg-[rgba(48,240,168,0.05)] transition border border-[#1e2a24] snap-center flex flex-col justify-between">
-                                <div>
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="bg-[rgba(48,240,168,0.1)] p-2 rounded-full mb-2 w-fit">
-                                            <Target size={18} className="text-[#30f0a8]" />
+                            <div key={box.id} className="relative group/card">
+                                <Link href={`/moneybox/${box.id}`} className="card min-w-[240px] p-4 hover:bg-[rgba(48,240,168,0.05)] transition border border-[#1e2a24] snap-center flex flex-col justify-between h-full block">
+                                    <div>
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="bg-[rgba(48,240,168,0.1)] p-2 rounded-full mb-2 w-fit">
+                                                <Target size={18} className="text-[#30f0a8]" />
+                                            </div>
+                                            <span className="text-xs text-[#8da196] font-mono">{(box.progress || 0).toFixed(0)}%</span>
                                         </div>
-                                        <span className="text-xs text-[#8da196] font-mono">{(box.progress || 0).toFixed(0)}%</span>
+                                        <span className="font-semibold text-[#e8fdf4] block mb-1 truncate pr-6">{box.title || "Untitled Goal"}</span>
+                                        <p className="text-xs text-[#8da196] mb-3">Target: {(box.target || 0).toLocaleString()} USDC</p>
                                     </div>
-                                    <span className="font-semibold text-[#e8fdf4] block mb-1 truncate">{box.title || "Untitled Goal"}</span>
-                                    <p className="text-xs text-[#8da196] mb-3">Target: {(box.target || 0).toLocaleString()} USDC</p>
+                                    <div className="w-full h-2 bg-[rgba(48,240,168,0.1)] rounded-full overflow-hidden">
+                                        <div className="h-full bg-[#30f0a8]" style={{ width: `${box.progress || 0}%` }} />
+                                    </div>
+                                </Link>
+                                {/* Quick Actions Menu */}
+                                <div className="absolute top-2 right-2">
+                                    <div className="dropdown dropdown-end">
+                                        <div tabIndex={0} role="button" className="p-1.5 rounded-lg hover:bg-[#1e2a24] text-[#8da196] hover:text-[#e8fdf4] transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" /></svg>
+                                        </div>
+                                        <ul tabIndex={0} className="dropdown-content z-[20] menu p-2 shadow bg-[#0a0f0d] border border-[#1e2a24] rounded-box w-32 mt-1">
+                                            {/* We can add Withdraw logic later, for now just Delete which is the blocker */}
+                                            <li>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault(); // Prevent navigation
+                                                        if (confirm(`Delete "${box.title}"? This will remove the goal.`)) {
+                                                            import("@/lib/supabase").then(({ deleteMoneyBox }) => deleteMoneyBox(box.id));
+                                                            import("@/lib/local-db").then(({ deleteItem }) => deleteItem("moneyBoxes", box.id));
+                                                        }
+                                                    }}
+                                                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20 text-xs"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
-                                <div className="w-full h-2 bg-[rgba(48,240,168,0.1)] rounded-full overflow-hidden">
-                                    <div className="h-full bg-[#30f0a8]" style={{ width: `${box.progress || 0}%` }} />
-                                </div>
-                            </Link>
+                            </div>
                         ))
                     )}
                 </div>
