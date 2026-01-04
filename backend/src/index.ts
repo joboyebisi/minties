@@ -35,7 +35,6 @@ if (BACKEND_URL) {
 } else {
   console.log("💻 No BACKEND_URL found, starting in POLLING mode (Local Dev)");
   bot.startPolling({
-    interval: 300,
     params: { timeout: 10 }
   });
 }
