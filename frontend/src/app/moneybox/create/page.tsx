@@ -124,8 +124,9 @@ function CreateMoneyBoxForm() {
                     show("success", "Recurring saving permission granted!");
                 } catch (err: any) {
                     console.error("Permission Request Failed", err);
-                    show("error", `Permission Denied: ${err.message || 'User rejected request'}`);
-                    throw err;
+                    // Do NOT throw. Just warn.
+                    show("error", `Auto-save permission skipped: ${err.message || 'Not supported by wallet'}`);
+                    // We continue to save the moneybox, just without the permission active.
                 }
             }
 

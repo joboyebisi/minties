@@ -157,24 +157,25 @@ export async function supplyUsdc({
 
   let approveTx;
 
-  // 3. Approve if needed
-  if (currentAllowance < parsed) {
-    console.log(`Current allowance (${currentAllowance}) < Required (${parsed}). Approving...`);
-    approveTx = await walletClient.writeContract({
-      address: USDC_ADDRESS,
-      abi: erc20Abi,
-      functionName: "approve",
-      args: [AAVE_POOL_ADDRESS, parsed], // Use exact amount or max uint256
-      account: walletClient.account,
-    });
+  // 3. Approve ALWAYS (Force Approval to rule out allowance issues)
+  console.log(`Checking allowance: ${currentAllowance}. Forcing approval for safety...`);
 
-    console.log("Waiting for approval to be mined...", approveTx);
-    await publicClient.waitForTransactionReceipt({ hash: approveTx });
-    console.log("Approval confirmed. Waiting for propagation...");
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Propagate
-  } else {
-    console.log("Allowance sufficient. Skipping approval.");
-  }
+  // Optional: If allowance is huge but supply fails, maybe reset it? 
+  // For now, just approve exact amount needed or max.
+  // We will approve parsed amount + a bit buffer? No, just parsed.
+
+  approveTx = await walletClient.writeContract({
+    address: USDC_ADDRESS,
+    abi: erc20Abi,
+    functionName: "approve",
+    args: [AAVE_POOL_ADDRESS, parsed],
+    account: walletClient.account,
+  });
+
+  console.log("Waiting for approval to be mined...", approveTx);
+  await publicClient.waitForTransactionReceipt({ hash: approveTx });
+  console.log("Approval confirmed. Waiting for propagation...");
+  await new Promise(resolve => setTimeout(resolve, 3000)); // Increase wait to 3s
 
   // 4. Supply to Aave
   console.log("Supplying to Aave contract...");

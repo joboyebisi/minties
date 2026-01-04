@@ -71,29 +71,37 @@ export async function requestRecurringTransferPermission({
 
   try {
     // Use direct RPC call to bypass library wrapper issues
-    const grantedPermissions = await walletClient.request({
-      method: 'wallet_requestExecutionPermissions' as any,
-      params: [{
-        chainId: chainStr,
-        expiry,
-        signer: {
-          type: 'account',
-          data: {
-            address: sessionAccountAddress,
-          },
-        },
-        permissions: [{
-          type: 'erc20-token-periodic',
-          data: {
-            tokenAddress,
-            periodAmount: amountWei.toString(), // Ensure string for RPC
-            periodDuration,
-            justification: justification || `Recurring transfer of ${periodAmount} USDC`,
-          },
-        }],
-        isAdjustmentAllowed: true,
-      }]
-    }) as any;
+    // Use direct RPC call to bypass library wrapper issues
+    // Try newer Draft name first, then older
+    let grantedPermissions;
+    try {
+      grantedPermissions = await walletClient.request({
+        method: 'wallet_requestExecutionPermissions' as any,
+        params: [{
+          chainId: chainStr,
+          expiry,
+          signer: { type: 'account', data: { address: sessionAccountAddress } },
+          permissions: [{
+            type: 'erc20-token-periodic',
+            data: {
+              tokenAddress,
+              periodAmount: amountWei.toString(),
+              periodDuration,
+              justification: justification || `Recurring transfer of ${periodAmount} USDC`,
+            },
+          }],
+          isAdjustmentAllowed: true,
+        }]
+      }) as any;
+    } catch (e: any) {
+      if (e.message?.includes("not supported") || e.code === -32601) {
+        console.warn("wallet_requestExecutionPermissions not supported, trying fallback...");
+        // You could panic here or return null.
+        // For now, let's re-throw so the UI handles it as "Skipped" via our new graceful catch
+        throw new Error("Wallet does not support advanced permissions (ERC-7715). Auto-save skipped.");
+      }
+      throw e;
+    }
 
     return grantedPermissions[0];
   } catch (error) {
