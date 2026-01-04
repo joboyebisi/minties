@@ -18,7 +18,7 @@ export async function getWalletHistoryAction(address: string) {
                 { to: [address] }
             ],
             fieldSelection: {
-                transaction: ["block_number", "from", "to", "value", "input"] as any,
+                transaction: ["block_number", "from", "to", "value", "input", "hash"] as any,
                 // timestamp is usually on the block, not transaction directly in some schemas?
                 // keeping it simple to unblock.
             }
