@@ -84,7 +84,7 @@ export function ActivityDashboard() {
                     {transactions.map(tx => {
                         const isIncoming = tx.to.toLowerCase() === address.toLowerCase();
                         return (
-                            <div key={tx.hash} className="card p-3 flex justify-between items-center hover:bg-[rgba(48,240,168,0.02)] transition border border-[#1e2a24]">
+                            <div key={tx.hash || `${tx.block_number}-${Math.random()}`} className="card p-3 flex justify-between items-center hover:bg-[rgba(48,240,168,0.02)] transition border border-[#1e2a24]">
 
                                 <div className="flex items-center gap-3">
                                     <div className={`p-2 rounded-full ${isIncoming ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
@@ -95,7 +95,7 @@ export function ActivityDashboard() {
                                             {isIncoming ? "Received" : "Sent"}
                                         </p>
                                         <p className="text-xs text-[#8da196]">
-                                            {new Date((tx.timestamp || 0) * 1000).toLocaleDateString()}
+                                            {tx.block_number ? `Block ${tx.block_number}` : 'Pending'}
                                         </p>
                                     </div>
                                 </div>
@@ -104,14 +104,16 @@ export function ActivityDashboard() {
                                     <p className="text-sm font-bold text-[#e8fdf4]">
                                         {formatValue(tx.value)} <span className="text-xs font-normal text-[#8da196]">ETH</span>
                                     </p>
-                                    <a
-                                        href={`https://sepolia.etherscan.io/tx/${tx.hash}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-[10px] text-[#30f0a8] hover:underline flex items-center justify-end gap-1"
-                                    >
-                                        View <ExternalLink size={8} />
-                                    </a>
+                                    {tx.hash && (
+                                        <a
+                                            href={`https://sepolia.etherscan.io/tx/${tx.hash}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-[10px] text-[#30f0a8] hover:underline flex items-center justify-end gap-1"
+                                        >
+                                            View <ExternalLink size={8} />
+                                        </a>
+                                    )}
                                 </div>
                             </div>
                         );
