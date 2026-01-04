@@ -140,7 +140,6 @@ export default function MoneyBoxDashboardPage() {
 
                     await withdrawUsdc({
                         walletClient,
-                        publicClient,
                         amount: goal.currentAmount
                     });
 
