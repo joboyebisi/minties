@@ -8,6 +8,9 @@
 A **Telegram Mini App & Financial Super-App** built for the next billion users.  
 Features **Smart Accounts (Gasless)**, **Social Savings**, **Viral Gifting**, and **Fractional Real Estate Trading** on Mantle.
 
+<img width="2878" height="1702" alt="Minties Update" src="https://github.com/user-attachments/assets/00166fae-e79e-4756-bdd5-69959e39f74d" />
+
+
 ---
 
 ## 🚀 Features
@@ -31,7 +34,7 @@ Target savings with high yield on Sepolia.
 
 ### 4. 👥 Savings Circles
 Pooled savings for shared goals.
--   **ROSCA Style**: Contribute together towards a shared goal (e.g., "Group Trip").
+-   **ROSCA Style**: Contribute together towards a shared goal (e.g., "Group Real Estate Ownership").
 
 ---
 
@@ -152,6 +155,9 @@ We implemented "Delegated Access" for recurring savings, enabling a Web2-Subscri
 
 ### Envio HyperSync
 Used for instantaneous transaction history fetching, bypassing slow RPC calls.
+
+### Mantle Network
+High performance and low fees make fractional asset trading viable for micro-investors.
 
 ## License
 MIT
