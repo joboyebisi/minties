@@ -44,6 +44,24 @@ Pooled savings for shared goals.
 -   **Backend**: Supabase (PostgreSQL) for off-chain data (Contacts, Profiles).
 -   **Indexing**: Envio HyperSync (Real-time history).
 
+## 🔐 Advanced Permissions Usage (ERC-7715)
+Since the Hackathon is focused on the Advanced Permissions, here are the links for the code usage:
+
+-   **Requesting Permissions**: [requestRecurringTransferPermission](frontend/src/lib/metamask-permissions.ts#L46-L111)
+-   **Redeeming Permissions**: [redeemPermissionAndTransfer](frontend/src/lib/metamask-permissions.ts#L114-L167)
+
+## ⚡ Envio Usage
+We use **Envio HyperSync** to index Smart Account activity (deposits, gifts, claims) in real-time, allowing the UI to bypass slow standard RPC calls for transaction history.
+
+-   **HyperSync Client & Query**: [hypersync-actions.ts](frontend/src/app/actions/hypersync-actions.ts#L7-L28)
+
+## 🏙️ Mantle Usage
+We deployed our Asset Marketplace contracts to **Mantle Sepolia** to enable low-fee fractional trading.
+
+-   **Real Estate Contract**: [RealEstate.sol](contracts/contracts/RealEstate.sol)
+-   **Asset Group Factory**: [AssetGroupFactory.sol](contracts/contracts/AssetGroupFactory.sol)
+-   **Frontend Integration**: [Mantle Network Logic](frontend/src/app/savings-assets/page.tsx#L16-L108)
+
 ---
 
 ## 🔗 Contract Addresses
