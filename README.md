@@ -31,7 +31,7 @@ Target savings with high yield on Sepolia.
 
 ### 4. 👥 Savings Circles
 Pooled savings for shared goals.
--   **ROSCA Style**: Contribute together towards a shared goal (e.g., "Group Trip").
+-   **ROSCA Style**: Contribute together towards a shared goal (e.g., "Group Real Estate Ownership").
 
 ---
 
