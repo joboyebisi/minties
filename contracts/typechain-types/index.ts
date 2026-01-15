@@ -18,7 +18,15 @@ export type { IERC165 } from "./@openzeppelin/contracts/utils/introspection/IERC
 export { IERC165__factory } from "./factories/@openzeppelin/contracts/utils/introspection/IERC165__factory";
 export type { ReentrancyGuard } from "./@openzeppelin/contracts/utils/ReentrancyGuard";
 export { ReentrancyGuard__factory } from "./factories/@openzeppelin/contracts/utils/ReentrancyGuard__factory";
+export type { AssetGroup } from "./contracts/AssetGroup.sol/AssetGroup";
+export { AssetGroup__factory } from "./factories/contracts/AssetGroup.sol/AssetGroup__factory";
+export type { IRealEstate } from "./contracts/AssetGroup.sol/IRealEstate";
+export { IRealEstate__factory } from "./factories/contracts/AssetGroup.sol/IRealEstate__factory";
+export type { AssetGroupFactory } from "./contracts/AssetGroupFactory";
+export { AssetGroupFactory__factory } from "./factories/contracts/AssetGroupFactory__factory";
 export type { GiftEscrow } from "./contracts/GiftEscrow";
 export { GiftEscrow__factory } from "./factories/contracts/GiftEscrow__factory";
+export type { RealEstate } from "./contracts/RealEstate";
+export { RealEstate__factory } from "./factories/contracts/RealEstate__factory";
 export type { SavingsCircle } from "./contracts/SavingsCircle";
 export { SavingsCircle__factory } from "./factories/contracts/SavingsCircle__factory";

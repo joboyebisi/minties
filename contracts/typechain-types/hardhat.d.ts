@@ -38,9 +38,25 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReentrancyGuard__factory>;
     getContractFactory(
+      name: "AssetGroup",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AssetGroup__factory>;
+    getContractFactory(
+      name: "IRealEstate",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IRealEstate__factory>;
+    getContractFactory(
+      name: "AssetGroupFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AssetGroupFactory__factory>;
+    getContractFactory(
       name: "GiftEscrow",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.GiftEscrow__factory>;
+    getContractFactory(
+      name: "RealEstate",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RealEstate__factory>;
     getContractFactory(
       name: "SavingsCircle",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -77,10 +93,30 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ReentrancyGuard>;
     getContractAt(
+      name: "AssetGroup",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AssetGroup>;
+    getContractAt(
+      name: "IRealEstate",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IRealEstate>;
+    getContractAt(
+      name: "AssetGroupFactory",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AssetGroupFactory>;
+    getContractAt(
       name: "GiftEscrow",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.GiftEscrow>;
+    getContractAt(
+      name: "RealEstate",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.RealEstate>;
     getContractAt(
       name: "SavingsCircle",
       address: string | ethers.Addressable,
@@ -112,9 +148,25 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
     deployContract(
+      name: "AssetGroup",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AssetGroup>;
+    deployContract(
+      name: "IRealEstate",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IRealEstate>;
+    deployContract(
+      name: "AssetGroupFactory",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AssetGroupFactory>;
+    deployContract(
       name: "GiftEscrow",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.GiftEscrow>;
+    deployContract(
+      name: "RealEstate",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RealEstate>;
     deployContract(
       name: "SavingsCircle",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -151,10 +203,30 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
     deployContract(
+      name: "AssetGroup",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AssetGroup>;
+    deployContract(
+      name: "IRealEstate",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IRealEstate>;
+    deployContract(
+      name: "AssetGroupFactory",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AssetGroupFactory>;
+    deployContract(
       name: "GiftEscrow",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.GiftEscrow>;
+    deployContract(
+      name: "RealEstate",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RealEstate>;
     deployContract(
       name: "SavingsCircle",
       args: any[],

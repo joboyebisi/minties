@@ -201,14 +201,14 @@ export function UserDashboard() {
                 </div>
             </div>
 
-            {/* My Circles */}
+            {/* Savings & Assets */}
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-[#e8fdf4] flex items-center gap-2">
-                        <PiggyBank size={18} className="text-[#30f0a8]" /> Savings Circles
+                        <PiggyBank size={18} className="text-[#30f0a8]" /> Savings & Assets
                     </h3>
-                    <Link href="/circle/create" className="text-xs text-[#30f0a8] hover:underline flex items-center gap-1">
-                        Create <Plus size={14} />
+                    <Link href="/savings-assets" className="text-xs text-[#30f0a8] hover:underline flex items-center gap-1">
+                        View All <ArrowRight size={14} />
                     </Link>
                 </div>
 

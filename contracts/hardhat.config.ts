@@ -20,7 +20,12 @@ const config: HardhatUserConfig = {
       url: process.env.SEPOLIA_RPC_URL || "https://rpc.sepolia.org",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 11155111,
-      timeout: 60000, // increase RPC timeout to avoid headers timeout
+      timeout: 60000,
+    },
+    mantleSepolia: {
+      url: "https://rpc.sepolia.mantle.xyz",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 5003,
     },
   },
   etherscan: {

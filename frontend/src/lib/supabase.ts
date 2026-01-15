@@ -208,7 +208,11 @@ export async function getNotifications(userId: string) {
 
     if (error) throw error;
     return data as Notification[];
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code === '42P01' || error.message?.includes('relation "notifications" does not exist')) {
+      console.warn("Notifications table missing. Please run '03_notifications.sql'.");
+      return [];
+    }
     console.error("Error fetching notifications:", error);
     return [];
   }

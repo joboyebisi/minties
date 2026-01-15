@@ -1,96 +1,85 @@
-# Minties - MoneyBox, Crypto Gifts & Savings Circles
+# Minties - MoneyBox, Crypto Gifts & Real Estate Assets
 
 <div align="center">
   <img src="frontend/public/images/logo.png" alt="Minties Logo" width="120" />
-  <h3>Save, Gift, and Earn Crypto with Friends</h3>
+  <h3>Save, Gift, Trade, and Earn Crypto.</h3>
 </div>
 
-A **Telegram Mini App** for crypto savings, gifts, and yield earning. Built with **MetaMask Smart Accounts** for a seamless, gasless experience.
+A **Telegram Mini App & Financial Super-App** built for the next billion users.  
+Features **Smart Accounts (Gasless)**, **Social Savings**, **Viral Gifting**, and **Fractional Real Estate Trading** on Mantle.
 
-
-<img width="2750" height="1666" alt="Minties Readme" src="https://github.com/user-attachments/assets/5a44699d-b8dd-47ca-8ff4-5f35f11f5617" />
-
+---
 
 ## 🚀 Features
 
-### 💰 Money Box
-Target savings with high yield.
-- **Aave Integration**: Automatically deposit savings into Aave V3 (Sepolia) to earn yield.
-- **Recurring Savings**: Set up auto-save rules (e.g., 50 USDC/month) using ERC-7715 permissions.
-- **Visual Progress**: Track your goal with real-time progress bars.
+### 1. 🏙️ Fractional Real Estate (NEW - Mantle Network)
+Invest in premium real estate assets with friends.
+-   **Fractional Ownership**: Buy shares of assets (e.g., "Downtown Loft") for as little as 0.1 MNT.
+-   **Trading**: Sell your shares back to the protocol instantly to realize gains.
+-   **Circles to Buy**: Create a "Buying Circle" to pool funds with friends and acquire assets together.
+-   **Yield**: Earn yield from property revenue (simulated via contract).
 
-### 🎁 Crypto Gifts
-Send USDC as gifts with claimable links.
-- **Escrow Contracts**: Funds are held securely on-chain until claimed.
-- **Social Sharing**: Generate a unique link to share via Telegram or other chats.
-- **Gasless Claiming**: Recipients can claim even with empty wallets (via Relayers, simplified for demo).
+### 2. 💰 Money Box
+Target savings with high yield on Sepolia.
+-   **Aave Integration**: Automatically deposit savings into Aave V3 (Sepolia) to earn yield.
+-   **Recurring Savings**: Set up auto-save rules using ERC-7715 permissions.
 
-### 👥 Savings Circles
-Social saving with friends.
-- **Pooled Funds**: Contribute together towards a shared goal (e.g., "Group Trip").
-- **Yield Generating**: Circle funds earn DeFi yield while locked.
-- **Transparent**: View all participants and contributions.
+### 3. 🎁 Crypto Gifts
+Send USDC as gifts via a simple link.
+-   **Viral**: Send to anyone, even if they don't have a wallet yet.
+-   **Gasless Claiming**: Recipients claim funds without needing ETH for gas.
 
-## 🔐 Advanced Permissions Usage (ERC-7715)
-This project utilizes **MetaMask Advanced Permissions** (ERC-7715) via the Smart Accounts Kit to enable fine-grained, recurring allowances for auto-savings and subscriptions.
+### 4. 👥 Savings Circles
+Pooled savings for shared goals.
+-   **ROSCA Style**: Contribute together towards a shared goal (e.g., "Group Trip").
 
-- **Requesting Permissions**:
-  - Code Usage: [metamask-permissions.ts#L46](https://github.com/joboyebisi/minties/blob/main/frontend/src/lib/metamask-permissions.ts#L46)
-  - Usage (Recurring Gifts): [setupRecurringGift](https://github.com/joboyebisi/minties/blob/main/frontend/src/lib/metamask-permissions.ts#L201)
-  
-- **Redeeming Permissions**:
-  - Code Usage: [metamask-permissions.ts#L101](https://github.com/joboyebisi/minties/blob/main/frontend/src/lib/metamask-permissions.ts#L101)
-  - Usage (Transfer Execution): [redeemPermissionAndTransfer](https://github.com/joboyebisi/minties/blob/main/frontend/src/lib/metamask-permissions.ts#L101)
-
-## ⚡ Envio Usage
-We use **Envio HyperSync** to index Smart Account activity (deposits, gifts, claims) in real-time, allowing the UI to bypass slow standard RPC calls for transaction history.
-
-- **Server Action**: [`frontend/src/app/actions/hypersync-actions.ts`](frontend/src/app/actions/hypersync-actions.ts) (`getWalletHistoryAction`)
-- **UI Integration**: [`frontend/src/components/ActivityDashboard.tsx`](frontend/src/components/ActivityDashboard.tsx)
-- **Data Flow**: The dashboard fetches directly from HyperSync via a Next.js Server Action to display deposits and gift history instantly.
+---
 
 ## 🛠 Tech Stack
 
-- **Frontend**: Next.js 14 (App Router), TailwindCSS, Wagmi/Viem
-- **Smart Accounts**: MetaMask Smart Accounts Kit (Delegation & Permissions)
-- **Backend/DB**: Supabase (PostgreSQL), Next.js Server Actions
-- **Blockchain**: Ethereum Sepolia Testnet
-- **DeFi**: Aave V3 Protocol
-- **Indexing**: Envio HyperSync (Real-time data) / Hybrid Local Storage Fallback
+-   **Frontend**: Next.js 15 (App Router), TailwindCSS, Wagmi/Viem, Lucide React.
+-   **Smart Accounts**: MetaMask Smart Accounts Kit (Delegation & Permissions).
+-   **Chain (Assets)**: **Mantle Sepolia Testnet** (Real Estate, Asset Groups).
+-   **Chain (DeFi)**: **Ethereum Sepolia** (Aave, USDC).
+-   **Backend**: Supabase (PostgreSQL) for off-chain data (Contacts, Profiles).
+-   **Indexing**: Envio HyperSync (Real-time history).
 
-## 💡 Hackathon Implementation Feedback
+---
 
-### 🦊 MetaMask Smart Accounts (ERC-7715)
-Our experience building with the Smart Accounts Kit was largely positive but highlighted some "bleeding edge" challenges:
--   **The Good**: The concept of "delegated permissions" for recurring payments is powerful. Once set up, it truly enables a "Web2-like" subscription experience on-chain.
--   **The Challenge**: Browser wallet support for ERC-7715 is strict. We encountered generic errors when the wallet wasn't configured correctly.
--   **User Note**: Users often need to explicitly enable **"Experimental Features"** or **"Advanced Privacy"** settings in MetaMask for `wallet_requestExecutionPermissions` to work reliably. Without this, the method may be undefined.
--   **Our Solution**: We implemented a "Graceful Fallback" pattern—detecting if the permission logic fails and creating a standard one-time transaction instead.
+## 🔗 Contract Addresses
 
-### ⚡ Envio HyperSync
--   **Speed**: HyperSync decreased our data fetching time significantly compared to standard RPC calls.
--   **The Challenge**: We faced initial app crashes due to **Strict Type Handling** and **Client/Server Hydration Mismatches**. Unlike standard JSON-RPC which is forgiving, HyperSync's strict schema means any mismatch between the expected indexer schema and the frontend types can crash the page.
--   **Verdict**: Powerful, but requires robust error boundaries and strict type generation to prevent UI crashes.
+### Mantle Sepolia (Assets & Trading)
+| Contract | Address |
+|----------|---------|
+| **RealEstate** | `0x6c54439DE8243f3993D8286d51B53143119935Af` |
+| **AssetGroupFactory** | `0x7Af38C7df28796Ab68b01da9779339C9CEdcf1aF` |
 
-## 🔗 Contract Addresses (Sepolia)
-
+### Ethereum Sepolia (Savings & Gifts)
 | Contract | Address |
 |----------|---------|
 | **Gift Escrow** | `0x72425B766F61a83da983c1908460DF118FA125Ad` |
 | **Savings Circle** | `0xEf2BF49C0394560384301A209c8793160B3D2ac8` |
 | **USDC Token** | `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238` |
-| **Aave Pool** | `0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951` |
 
-## 📦 Quick Start
+---
+
+## 📦 Installation & Setup
 
 ### 1. Prerequisites
-- Node.js 18+ & npm/pnpm
+- Node.js 18+
 - Supabase Project
 
-### 2. Installation
+### 2. Clone & Install
 ```bash
 git clone https://github.com/joboyebisi/minties.git
-cd minties/frontend
+cd minties
+
+# Install Frontend
+cd frontend
+npm install
+
+# Install Contracts (Optional, for deploying)
+cd ../contracts
 npm install
 ```
 
@@ -100,38 +89,49 @@ Create `.env.local` in `frontend/`:
 NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=...
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+NEXT_PUBLIC_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 ```
 
-### 4. Database Setup (Supabase)
-Run the SQL migrations in your Supabase SQL Editor:
-1. `src/migrations/01_profiles.sql` (User Profiles)
-2. `src/migrations/02_features.sql` (MoneyBox, Circles, Gifts, Contacts)
-3. `src/migrations/03_notifications.sql` (Notifications System)
-
-### 5. Run Locally
+### 4. Run Application
 ```bash
+cd frontend
 npm run dev
 # Open http://localhost:3000
 ```
 
-## 📱 How to Use (Demo Flow)
+---
 
-1. **Connect Wallet**: Use MetaMask (supports Smart Account creation).
-2. **Create Profile**: Set a display name.
-3. **Telegram Integration**: Click the Telegram icon to sync contacts and open the bot.
-4. **Create MoneyBox**: 
-   - Go to "New Goal", enter amount & timeline.
-   - Enable "Yield" to deposit into Aave.
-5. **Send Gift**:
-   - Go to "Send Gift", enter amount.
-   - Copy the generated link to share.
-6. **Create Circle**:
-   - Go to "New Circle", set target.
-   - Invite friends using your circle ID.
+## 📱 User Guide (How to Test)
 
-## ⚠️ Notes
-- **Persistence**: The app uses a hybrid strategy (Supabase + Local Storage).
-- **Envio**: Historical data indexing is supported via HyperSync.
+### 🟢 Testing Savings & Gifts (Sepolia)
+1.  **Connect Wallet**: Login with MetaMask.
+2.  **Create MoneyBox**: Go to **Money**, click "New Goal", enable Yield.
+3.  **Send Gift**: Go to **Money**, click "Send Gift".
+
+### 🔵 Testing Real Estate (Mantle Sepolia)
+1.  **Switch Network**: Clicking "Savings & Assets" will prompt to switch to **Mantle Sepolia**.
+    -   *Faucet*: Get MNT from [Mantle Faucet](https://faucet.testnet.mantle.xyz/).
+2.  **Buy Shares**:
+    -   Go to **Savings & Assets** -> **Save To Buy**.
+    -   Select a property (e.g., "Downtown Loft").
+    -   Click **Buy Share**, enter amount, confirm.
+3.  **Trade (Sell)**:
+    -   Go to **My Assets** tab.
+    -   View your portfolio value.
+    -   Click **Sell** on an asset to liquidate it back to MNT.
+4.  **Circle to Buy**:
+    -   Select a property -> Click **Circle to Buy**.
+    -   Invite friends (by address) and split the equity.
+
+---
+
+## 💡 Hackathon Insights
+
+### MetaMask Smart Accounts (ERC-7715)
+We implemented "Delegated Access" for recurring savings, enabling a Web2-Subscription-like experience on-chain.
+
+### Envio HyperSync
+Used for instantaneous transaction history fetching, bypassing slow RPC calls.
 
 ## License
 MIT
