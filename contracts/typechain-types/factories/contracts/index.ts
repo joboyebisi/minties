@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as assetGroupSol from "./AssetGroup.sol";
+export * as simpleFlashLoanSol from "./SimpleFlashLoan.sol";
 export { AssetGroupFactory__factory } from "./AssetGroupFactory__factory";
 export { GiftEscrow__factory } from "./GiftEscrow__factory";
 export { RealEstate__factory } from "./RealEstate__factory";

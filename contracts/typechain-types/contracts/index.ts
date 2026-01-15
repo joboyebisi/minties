@@ -3,6 +3,8 @@
 /* eslint-disable */
 import type * as assetGroupSol from "./AssetGroup.sol";
 export type { assetGroupSol };
+import type * as simpleFlashLoanSol from "./SimpleFlashLoan.sol";
+export type { simpleFlashLoanSol };
 export type { AssetGroupFactory } from "./AssetGroupFactory";
 export type { GiftEscrow } from "./GiftEscrow";
 export type { RealEstate } from "./RealEstate";

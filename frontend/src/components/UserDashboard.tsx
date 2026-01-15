@@ -90,6 +90,10 @@ export function UserDashboard() {
         address,
         token: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
     });
+    const { data: mntBalance } = useBalance({
+        address,
+        chainId: 5003 // Mantle Sepolia Testnet ID
+    });
 
     // Fetch Profile
     useEffect(() => {
@@ -134,7 +138,12 @@ export function UserDashboard() {
                         <div className="w-px bg-[#1e2a24]"></div>
                         <div>
                             <p className="text-lg font-bold text-[#e8fdf4]">{ethBalance?.formatted.slice(0, 6) || "0.00"} <span className="text-sm text-[#30f0a8]">ETH</span></p>
-                            <p className="text-xs text-[#8da196]">Gas</p>
+                            <p className="text-xs text-[#8da196]">Gas (Sepolia)</p>
+                        </div>
+                        <div className="w-px bg-[#1e2a24]"></div>
+                        <div>
+                            <p className="text-lg font-bold text-[#e8fdf4]">{mntBalance?.formatted.slice(0, 6) || "0.00"} <span className="text-sm text-[#30f0a8]">MNT</span></p>
+                            <p className="text-xs text-[#8da196]">Gas (Mantle)</p>
                         </div>
                     </div>
                 </div>

@@ -22,12 +22,12 @@ Invest in premium real estate assets with friends.
 ### 2. 💰 Money Box
 Target savings with high yield on Sepolia.
 -   **Aave Integration**: Automatically deposit savings into Aave V3 (Sepolia) to earn yield.
+-   **Flash Loan Demo**: Borrow funds instantly without collateral using our integrated Aave Flash Loan tool.
 -   **Recurring Savings**: Set up auto-save rules using ERC-7715 permissions.
 
-### 3. 🎁 Crypto Gifts
-Send USDC as gifts via a simple link.
--   **Viral**: Send to anyone, even if they don't have a wallet yet.
--   **Gasless Claiming**: Recipients claim funds without needing ETH for gas.
+### 3. 🎁 Crypto Gifts & Wallet
+-   **Multi-Chain Balance**: View **MNT** (Mantle) and **ETH** (Sepolia) gas balances in one dashboard.
+-   **Viral Gifts**: Send USDC to anyone via a simple link (Gasless Claiming).
 
 ### 4. 👥 Savings Circles
 Pooled savings for shared goals.
@@ -59,6 +59,7 @@ Pooled savings for shared goals.
 |----------|---------|
 | **Gift Escrow** | `0x72425B766F61a83da983c1908460DF118FA125Ad` |
 | **Savings Circle** | `0xEf2BF49C0394560384301A209c8793160B3D2ac8` |
+| **SimpleFlashLoan** | `0x83B32997B28062972EfE86f54D1C20a7eA322c7f` |
 | **USDC Token** | `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238` |
 
 ---
@@ -106,7 +107,8 @@ npm run dev
 ### 🟢 Testing Savings & Gifts (Sepolia)
 1.  **Connect Wallet**: Login with MetaMask.
 2.  **Create MoneyBox**: Go to **Money**, click "New Goal", enable Yield.
-3.  **Send Gift**: Go to **Money**, click "Send Gift".
+3.  **Flash Loan**: Go to **Savings & Assets** (on Sepolia) -> Click "Execute Loan" to borrow 10 USDC instantly.
+4.  **Send Gift**: Go to **Money**, click "Send Gift".
 
 ### 🔵 Testing Real Estate (Mantle Sepolia)
 1.  **Switch Network**: Clicking "Savings & Assets" will prompt to switch to **Mantle Sepolia**.

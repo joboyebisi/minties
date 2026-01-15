@@ -112,11 +112,72 @@ function SaveToBuyTab({ isMantle }: { isMantle: boolean }) {
     const [circleModalOpen, setCircleModalOpen] = useState(false);
     const [selectedProp, setSelectedProp] = useState<any>(null);
 
+    // Flash Loan State
+    const [flashLoading, setFlashLoading] = useState(false);
+    const { writeContractAsync } = useWriteContract();
+    const [flashTx, setFlashTx] = useState("");
+
     const handleBuyClick = (prop: any) => { setSelectedProp(prop); setBuyModalOpen(true); }
     const handleCircleClick = (prop: any) => { setSelectedProp(prop); setCircleModalOpen(true); }
 
+    const executeFlashLoan = async () => {
+        setFlashLoading(true);
+        try {
+            // Flash Loan Contract on Sepolia
+            const FLASH_LOAN_ADDRESS = "0x83B32997B28062972EfE86f54D1C20a7eA322c7f";
+            const USDC_ADDRESS = "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8";
+
+            // Minimal ABI for the function we added
+            const abi = [{
+                inputs: [
+                    { name: "_token", type: "address" },
+                    { name: "_amount", type: "uint256" }
+                ],
+                name: "fn_RequestFlashLoan",
+                outputs: [],
+                stateMutability: "nonpayable",
+                type: "function"
+            }];
+
+            const tx = await writeContractAsync({
+                address: FLASH_LOAN_ADDRESS,
+                abi: abi,
+                functionName: "fn_RequestFlashLoan",
+                args: [USDC_ADDRESS, BigInt(10 * 10 ** 6)], // Borrow 10 USDC (6 decimals)
+            });
+            setFlashTx(tx);
+        } catch (e) {
+            console.error("Flash Loan Error", e);
+        } finally {
+            setFlashLoading(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
+            {!isMantle && (
+                <div className="card p-5 border border-indigo-500/20 bg-indigo-500/5 mb-6 relative overflow-hidden">
+                    <div className="relative z-10 flex justify-between items-center">
+                        <div>
+                            <h3 className="text-indigo-400 font-bold text-lg flex items-center gap-2"><DollarSign size={18} /> Aave Flash Loan Demo</h3>
+                            <p className="text-xs text-[#8da196] mt-1 max-w-xs">Borrow 10 USDC without collateral on Sepolia network. (Requires contract to have gas fees pre-funded technically, but for demo we simulate call).</p>
+                        </div>
+                        <button
+                            onClick={executeFlashLoan}
+                            disabled={flashLoading}
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition disabled:opacity-50 flex items-center gap-2"
+                        >
+                            {flashLoading ? <Loader2 className="animate-spin" size={14} /> : "Execute Loan"}
+                        </button>
+                    </div>
+                    {flashTx && (
+                        <div className="mt-3 text-xs bg-black/20 p-2 rounded border border-indigo-500/20 text-indigo-300 font-mono truncate">
+                            Tx: {flashTx}
+                        </div>
+                    )}
+                </div>
+            )}
+
             {!isMantle ? (
                 <div className="text-center py-12 text-[#8da196] bg-white/5 rounded-2xl">Connect to Mantle to view assets.</div>
             ) : isLoading ? (

@@ -61,6 +61,22 @@ declare module "hardhat/types/runtime" {
       name: "SavingsCircle",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SavingsCircle__factory>;
+    getContractFactory(
+      name: "FlashLoanSimpleReceiverBase",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FlashLoanSimpleReceiverBase__factory>;
+    getContractFactory(
+      name: "IFlashLoanSimpleReceiver",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IFlashLoanSimpleReceiver__factory>;
+    getContractFactory(
+      name: "IPool",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPool__factory>;
+    getContractFactory(
+      name: "SimpleFlashLoan",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SimpleFlashLoan__factory>;
 
     getContractAt(
       name: "Ownable",
@@ -122,6 +138,26 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.SavingsCircle>;
+    getContractAt(
+      name: "FlashLoanSimpleReceiverBase",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FlashLoanSimpleReceiverBase>;
+    getContractAt(
+      name: "IFlashLoanSimpleReceiver",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IFlashLoanSimpleReceiver>;
+    getContractAt(
+      name: "IPool",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPool>;
+    getContractAt(
+      name: "SimpleFlashLoan",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SimpleFlashLoan>;
 
     deployContract(
       name: "Ownable",
@@ -171,6 +207,22 @@ declare module "hardhat/types/runtime" {
       name: "SavingsCircle",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.SavingsCircle>;
+    deployContract(
+      name: "FlashLoanSimpleReceiverBase",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FlashLoanSimpleReceiverBase>;
+    deployContract(
+      name: "IFlashLoanSimpleReceiver",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IFlashLoanSimpleReceiver>;
+    deployContract(
+      name: "IPool",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IPool>;
+    deployContract(
+      name: "SimpleFlashLoan",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.SimpleFlashLoan>;
 
     deployContract(
       name: "Ownable",
@@ -232,6 +284,26 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.SavingsCircle>;
+    deployContract(
+      name: "FlashLoanSimpleReceiverBase",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FlashLoanSimpleReceiverBase>;
+    deployContract(
+      name: "IFlashLoanSimpleReceiver",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IFlashLoanSimpleReceiver>;
+    deployContract(
+      name: "IPool",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IPool>;
+    deployContract(
+      name: "SimpleFlashLoan",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.SimpleFlashLoan>;
 
     // default types
     getContractFactory(
