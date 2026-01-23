@@ -1,0 +1,28 @@
+{
+    "version": "0.1.0",
+    "description": "Minties Snap for Multi-Network Management",
+    "proposedName": "Minties Snap",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/joboyebisi/minties.git"
+    },
+    "source": {
+        "shasum": "w0+1+0",
+        "location": {
+            "npm": {
+                "filePath": "dist/bundle.js",
+                "iconPath": "images/icon.svg",
+                "packageName": "minties-snap",
+                "registry": "https://registry.npmjs.org/"
+            }
+        }
+    },
+    "initialPermissions": {
+        "snap_dialog": {},
+        "endowment:rpc": {
+            "dapps": true,
+            "snaps": false
+        }
+    },
+    "manifestVersion": "0.1"
+}

@@ -1,0 +1,22 @@
+{
+    "name": "minties-snap",
+    "version": "0.1.0",
+    "description": "Minties Multi-Network Management Snap",
+    "main": "src/index.js",
+    "scripts": {
+        "build": "mm-snap build",
+        "serve": "mm-snap serve",
+        "start": "mm-snap watch"
+    },
+    "dependencies": {
+        "@metamask/snaps-sdk": "^4.0.0"
+    },
+    "devDependencies": {
+        "@metamask/snaps-cli": "^6.0.0",
+        "typescript": "^5.0.0",
+        "@metamask/snaps-types": "^3.0.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}

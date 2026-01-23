@@ -116,20 +116,29 @@ function CreateMoneyBoxForm() {
                     console.log("Requesting Permissions...");
                     const client = createWalletClientWithPermissions();
                     // Request recurring transfer permission
-                    await setupMoneyBoxRecurringTransfer({
+                    const permissionResult = await setupMoneyBoxRecurringTransfer({
                         walletClient: client as any,
                         sessionAccountAddress: address,
                         monthlyAmount: contributionPerPeriod.toFixed(2),
                         frequency: formData.durationUnit,
                         duration: durationVal
                     });
-                    show("success", "Recurring saving permission granted!");
+
+                    console.log("Permission Granted:", permissionResult);
+                    if (permissionResult) {
+                        show("success", "Recurring saving permission granted!");
+                        // TODO: Save permissionResult to Backend for the Bot Agent
+                        // await saveBackendPermission(permissionResult);
+                    } else {
+                        // Fallback if result is null but no error thrown
+                        isAutoSaveAuthorized = false;
+                    }
                 } catch (err: any) {
                     console.error("Permission Request Failed", err);
                     isAutoSaveAuthorized = false; // Disable auto-save for this goal
 
                     // Graceful handling: Just warn the user
-                    show("info", "Auto-save not supported by wallet. Created as manual goal.");
+                    show("info", "Auto-save skipped (Wallet rejected or invalid params). Created as manual goal.");
                 }
             }
 

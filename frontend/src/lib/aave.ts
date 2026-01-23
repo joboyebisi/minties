@@ -1,10 +1,10 @@
 import { createPublicClient, http, getContract } from "viem";
 import { Address, Hash } from "viem";
 
-// Aave v3 Sepolia addresses (provided)
-export const AAVE_POOL_ADDRESS: Address = "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951";
-export const AAVE_ORACLE_ADDRESS: Address = "0xAc6D153b376e238F74d1c6Ec232e10dE3b0B8eE3";
-export const USDC_ADDRESS: Address = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
+// Aave v3 Sepolia addresses (Mocked for Mantle Sepolia Hackathon)
+export const AAVE_POOL_ADDRESS: Address = "0x7C09cE8a6022BC2B57Cb0043a320946e52821dA4";
+export const AAVE_ORACLE_ADDRESS: Address = "0x0000000000000000000000000000000000000000"; // Not used in mock
+export const USDC_ADDRESS: Address = "0x153e83b10d571AA5321CC921Ca2DF0B605731ccb";
 
 // Minimal ABIs
 const poolAbi = [

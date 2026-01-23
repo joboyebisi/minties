@@ -79,7 +79,6 @@ export async function requestRecurringTransferPermission({
         method: 'wallet_requestExecutionPermissions' as any,
         params: [{
           chainId: chainStr,
-          expiry,
           signer: { type: 'account', data: { address: sessionAccountAddress } },
           permissions: [{
             type: 'erc20-token-periodic',
@@ -89,8 +88,51 @@ export async function requestRecurringTransferPermission({
               periodDuration,
               justification: justification || `Recurring transfer of ${periodAmount} USDC`,
             },
-          }],
-          isAdjustmentAllowed: true,
+            // Move expiry here if validator expects it per-permission or remove if handled by wallet default?
+            // Actually, recent drafts use 'expiry' at top level but maybe wallet implementation lags/diverges.
+            // Validator said 'permission - Expected an object' (singular). This is key.
+            // Let's try matching the "singular permission" structure:
+          }] as any,
+          // Validator complained about 'expiry' at root (type never).
+        }]
+      }) as any;
+
+      // Alternative: Verify if it simply wants 'permission' (singular) object and NO array.
+      // And check 'expiry' location.
+      // Trying the singular 'permission' schema matching "0 > permission - Expected an object"
+      /*
+      grantedPermissions = await walletClient.request({
+        method: 'wallet_requestExecutionPermissions' as any,
+        params: [{
+          chainId: chainStr,
+          signer: { type: 'account', data: { address: sessionAccountAddress } },
+          permission: { // Singular
+             type: 'erc20-token-periodic',
+             data: { ... },
+             expiry: expiry 
+          }
+        }]
+      })
+      */
+
+      // Let's apply the Singular fix:
+      grantedPermissions = await walletClient.request({
+        method: 'wallet_requestExecutionPermissions' as any,
+        params: [{
+          chainId: chainStr,
+          signer: { type: 'account', data: { address: sessionAccountAddress } },
+          permission: {
+            type: 'erc20-token-periodic',
+            data: {
+              tokenAddress,
+              periodAmount: amountWei.toString(),
+              periodDuration,
+              justification: justification || `Recurring transfer of ${periodAmount} USDC`,
+            },
+            expiry: expiry
+          },
+          // Removed top-level expiry
+          // Removed isAdjustmentAllowed (validator said 'never')
         }]
       }) as any;
     } catch (e: any) {

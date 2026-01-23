@@ -7,5 +7,7 @@ import type * as simpleFlashLoanSol from "./SimpleFlashLoan.sol";
 export type { simpleFlashLoanSol };
 export type { AssetGroupFactory } from "./AssetGroupFactory";
 export type { GiftEscrow } from "./GiftEscrow";
+export type { MockAavePool } from "./MockAavePool";
+export type { MockUSDC } from "./MockUSDC";
 export type { RealEstate } from "./RealEstate";
 export type { SavingsCircle } from "./SavingsCircle";

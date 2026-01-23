@@ -16,28 +16,24 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 
 // Initialize Telegram Bot
-// Initialize Telegram Bot
-import { bot } from "./telegram/client.js";
+// import { bot } from "./telegram/client.js"; // Legacy
+import { setupGrammyBot } from "./telegram/grammyBot.js";
 
-const BACKEND_URL = process.env.BACKEND_URL; // e.g. https://minties-backend.onrender.com
+const BACKEND_URL = process.env.BACKEND_URL;
 
-// If we are in production (BACKEND_URL is set), use Webhook.
-// If we are local (no BACKEND_URL), use Polling.
+// Initialize Grammy Bot (Agent)
+setupGrammyBot();
+
+/* Legacy Bot Logic (Disabled)
 if (BACKEND_URL) {
   const webhookUrl = `${BACKEND_URL}/api/telegram/webhook`;
   console.log(`🌍 Setting up Telegram Webhook at: ${webhookUrl}`);
-
-  bot.setWebHook(webhookUrl).then(() => {
-    console.log("✅ Webhook set successfully");
-  }).catch((err) => {
-    console.error("❌ Failed to set webhook:", err.message);
-  });
+  // ...
 } else {
-  console.log("💻 No BACKEND_URL found, starting in POLLING mode (Local Dev)");
-  bot.startPolling();
+  // ...
 }
-
 setupTelegramBot(bot);
+*/
 
 // API Routes
 app.use("/api/gift", giftRoutes);

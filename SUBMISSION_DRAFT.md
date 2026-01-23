@@ -59,3 +59,13 @@ We built a fully functional "Financial Super-App" from scratch, focusing on comp
     *   Built a robust backend to sync Telegram Contacts with on-chain identities.
 
 **Outcome**: A production-ready Mini App where a user can onboard, save, gift, and invest in real estate in under 60 seconds, with zero gas friction.
+
+---
+
+## Mantle Implementation Insights
+
+Our experience building the "Save to Buy" Real Estate marketplace on Mantle Network highlighted three key advantages:
+
+1.  **Micro-Transaction Viability**: The core challenge of "Fractional Real Estate" is that high gas fees usually destroy the economics of buying small shares (e.g., $10). Mantle's ultra-low fees allowed us to enable truly casual investing where users can trade small amounts without friction.
+2.  **Instant Trading Experience**: We built a "Liquid Trading" engine where users can sell shares back to the protocol. Mantle's fast block times made this feel instantaneous—crucial for a consumer-facing Telegram Mini App where users expect "Web2 speed."
+3.  **Seamless Portability**: We ported our complex `AssetGroupFactory` contracts (originally designed for generic EVM) to Mantle with zero code changes. The tooling (Hardhat, Viem) worked out-of-the-box, allowing us to focus entirely on the "Circle to Buy" innovation rather than infrastructure debugging.
