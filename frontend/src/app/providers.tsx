@@ -8,11 +8,11 @@ import { metaMask } from "wagmi/connectors";
 import { useState } from "react";
 
 const config = createConfig({
-  chains: [sepolia, mantleSepoliaTestnet],
+  chains: [mantleSepoliaTestnet, sepolia],
   connectors: [metaMask()],
   transports: {
-    [sepolia.id]: http(process.env.NEXT_PUBLIC_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com"),
     [mantleSepoliaTestnet.id]: http("https://rpc.sepolia.mantle.xyz"),
+    [sepolia.id]: http(process.env.NEXT_PUBLIC_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com"),
   },
 });
 

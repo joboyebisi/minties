@@ -48,6 +48,8 @@ export const tools = [
 
 export async function executeTool(name: string, args: any) {
     try {
+        if (!supabase) return "Database connection unavailable.";
+
         switch (name) {
             case "get_user_profile":
                 const { data: profile } = await supabase
@@ -66,7 +68,8 @@ export async function executeTool(name: string, args: any) {
                 if (!boxes || boxes.length === 0) return "No Money Boxes found.";
                 return JSON.stringify(boxes.map(b => `${b.title}: ${b.current_amount}/${b.target_amount} USDC`));
 
-            case "get_available_assets", "get_assets": // Handle aliases
+            case "get_available_assets":
+            case "get_assets": // Handle aliases
                 // Mock or fetch from DB if we had an assets table (currently hardcoded in frontend)
                 // Let's return a static list for the hackathon MVP matching the frontend
                 return JSON.stringify([

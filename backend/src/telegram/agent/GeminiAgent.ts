@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { tools, executeTool } from "./tools.js";
 
 // Initialize Gemini
@@ -10,11 +10,23 @@ if (!apiKey) {
 const genAI = new GoogleGenerativeAI(apiKey || "");
 
 // Map our simpler tools definition to Gemini's expected format
-const formattedTools = {
+const formattedTools: any = {
     functionDeclarations: tools.map(t => ({
         name: t.name,
         description: t.description,
-        parameters: t.parameters
+        parameters: {
+            type: SchemaType.OBJECT,
+            properties: Object.entries(t.parameters.properties).reduce((acc: any, [key, val]: [string, any]) => {
+                acc[key] = {
+                    ...val,
+                    type: val.type === 'number' ? SchemaType.NUMBER :
+                        val.type === 'boolean' ? SchemaType.BOOLEAN :
+                            SchemaType.STRING
+                };
+                return acc;
+            }, {}),
+            required: t.parameters.required
+        }
     }))
 };
 

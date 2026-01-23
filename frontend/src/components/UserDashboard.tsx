@@ -163,9 +163,16 @@ export function UserDashboard() {
                     <h3 className="text-lg font-semibold text-[#e8fdf4] flex items-center gap-2">
                         <Target size={18} className="text-[#30f0a8]" /> My Goals
                     </h3>
-                    <Link href="/moneybox/create" className="text-xs text-[#30f0a8] hover:underline flex items-center gap-1">
-                        Create <Plus size={14} />
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        {moneyBoxes.length > 0 && (
+                            <Link href="/moneybox" className="text-xs text-[#8da196] hover:text-[#e8fdf4] transition">
+                                View All
+                            </Link>
+                        )}
+                        <Link href="/moneybox/create" className="text-xs text-[#30f0a8] hover:underline flex items-center gap-1">
+                            Create <Plus size={14} />
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Horizontal Scroll / Carousel */}

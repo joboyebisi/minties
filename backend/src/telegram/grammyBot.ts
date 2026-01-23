@@ -1,15 +1,13 @@
-import { Bot, Context, session } from "grammy";
+import { Bot, Context, session, SessionFlavor } from "grammy";
 import { GeminiAgent } from "./agent/GeminiAgent.js";
 import { supabase } from "../lib/supabase.js";
 
 // Session interface (if we want to store simple data)
 interface SessionData {
-    agent?: GeminiAgent;
-    // Note: GeminiAgent object is not serializable for Redis/DB sessions usually.
-    // For basic in-memory polling, this map approach works.
-    // For production, we'd persist the *history* and recreate the Agent.
-    // Let's use a simpler Map for the Agent instances for this Hackathon.
+    agent?: any;
 }
+
+type MyContext = Context & SessionFlavor<SessionData>;
 
 // In-memory store for Agents (ChatID -> Agent)
 const agents = new Map<number, GeminiAgent>();
@@ -21,7 +19,7 @@ export function setupGrammyBot() {
         return null;
     }
 
-    const bot = new Bot(token);
+    const bot = new Bot<MyContext>(token);
     const frontendUrl = process.env.FRONTEND_URL || "https://minties.vercel.app";
 
     // --- Middleware ---
